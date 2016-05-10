@@ -1,0 +1,6 @@
+[package]
+name = "rust-steering-behaviors"
+version = "0.1.0"
+authors = ["orhanbalci <orhanbalci@gmail.com>"]
+
+[dependencies]
