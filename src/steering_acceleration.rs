@@ -7,7 +7,9 @@ use std::ops::MulAssign;
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
 pub struct SteeringAcceleration<T: Num + AddAssign + MulAssign + Copy> {
+    /// linear acceleration component
     pub linear: Vector3<T>,
+    /// angular acceleration component
     pub angular: T,
 }
 
@@ -44,4 +46,12 @@ impl<T: Num + AddAssign + MulAssign + Copy> SteeringAcceleration<T> {
         self.linear *= Vector3::repeat(scale);
         self
     }
+
+    fn mulAdd(self : &mut Self, other : SteeringAcceleration<T>, scale : T)-> &mut Self{
+        self.angular = self.angular + (other.angular * scale);
+        self.linear += (other.linear * Vector3::repeat(scale));
+        self
+    }
+
+
 }
