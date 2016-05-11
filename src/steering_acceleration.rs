@@ -39,9 +39,9 @@ impl<T: Num + AddAssign + MulAssign + Copy> SteeringAcceleration<T> {
         self
     }
 
-    fn scl(self : &mut Self, scale : T) -> &mut Self{
+    fn scl(self: &mut Self, scale: T) -> &mut Self {
         self.angular = self.angular * scale;
-        self.linear *= Vector3::repeat(scale);        
+        self.linear *= Vector3::repeat(scale);
         self
     }
 }
