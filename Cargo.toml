@@ -5,3 +5,4 @@ authors = ["orhanbalci <orhanbalci@gmail.com>"]
 
 [dependencies]
 nalgebra="*"
+num="*"
