@@ -1,5 +1,5 @@
 [package]
-name = "steering_behaviors"
+name = "steering"
 version = "0.1.0"
 authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 

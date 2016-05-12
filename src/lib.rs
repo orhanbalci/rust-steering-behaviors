@@ -1,7 +1,12 @@
 extern crate nalgebra;
 extern crate num;
 
-pub mod steerable;
-pub mod steering_behavior;
-pub mod limiter;
-pub mod steering_acceleration;
+pub use self::steerable::Steerable;
+pub use self::steering_behavior::SteeringBehavior;
+pub use self::limiter::Limiter;
+pub use self::steering_acceleration::SteeringAcceleration;
+
+mod steerable;
+mod steering_behavior;
+mod limiter;
+mod steering_acceleration;

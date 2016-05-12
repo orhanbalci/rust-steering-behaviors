@@ -1,5 +1,4 @@
 use nalgebra::{Vector3, Repeat, Point3, FloatPoint, BaseFloat, ApproxEq};
-use num::num_traits::Num;
 use num::Zero;
 use std::ops::AddAssign;
 use std::ops::MulAssign;
@@ -51,7 +50,7 @@ impl<T: BaseFloat + AddAssign + MulAssign + Copy + ApproxEq<T>> SteeringAccelera
     ///
     fn mulAdd(self : &mut Self, other : SteeringAcceleration<T>, scale : T)-> &mut Self{
         self.angular = self.angular + (other.angular * scale);
-        self.linear += (other.linear * Vector3::repeat(scale));
+        self.linear += other.linear * Vector3::repeat(scale);
         self
     }
     
