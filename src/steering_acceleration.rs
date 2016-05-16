@@ -1,7 +1,5 @@
 use nalgebra::{Vector3, Repeat, Point3, FloatPoint, BaseFloat, ApproxEq};
 use num::Zero;
-use std::ops::AddAssign;
-use std::ops::MulAssign;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.

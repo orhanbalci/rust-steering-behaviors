@@ -10,4 +10,6 @@ pub trait Steerable<T> {
 
     /// returns bounding circle radius of the agent
     fn get_bounding_radius(self: &Self) -> T;
+
+    fn get_position(self :&Self) -> &Vector3<T>;
 }
