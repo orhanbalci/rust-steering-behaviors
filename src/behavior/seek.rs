@@ -1,4 +1,4 @@
-use nalgebra::{Vector3, BaseFloat, ApproxEq};
+use nalgebra::{Vector3, BaseFloat, ApproxEq, Norm, Repeat};
 use super::super::SteeringBehavior;
 use super::super::{SteeringAcceleration, SteeringAccelerationCalculator};
 
@@ -11,12 +11,18 @@ pub struct Seek<'a, T: 'a + BaseFloat + ApproxEq<T>> {
 }
 
 impl<'a, T: BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Seek<'a, T> {
-    fn calculate_real_steering<'b>(self : &mut Self, steering_acceleration : &'b mut SteeringAcceleration<T>) -> &'b mut SteeringAcceleration<T>{
-        steering_acceleration.linear = self.target - *self.behavior.owner.get_position();
+    fn calculate_real_steering<'b>(self: &mut Self,
+                                   steering_acceleration: &'b mut SteeringAcceleration<T>)
+                                   -> &'b mut SteeringAcceleration<T> {
+        steering_acceleration.linear = (self.target - *self.behavior.owner.get_position())
+                                           .normalize() *
+                                       Vector3::repeat(self.behavior
+                                                           .limiter
+                                                           .get_max_linear_acceleration());
         steering_acceleration
     }
 
-    fn is_enabled(self : &Self)->bool{
+    fn is_enabled(self: &Self) -> bool {
         self.behavior.enabled
     }
 }
