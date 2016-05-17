@@ -6,7 +6,7 @@ pub use self::steering_behavior::SteeringBehavior;
 pub use self::limiter::Limiter;
 pub use self::steering_acceleration::SteeringAcceleration;
 pub use self::steering_acceleration::SteeringAccelerationCalculator;
-pub use behavior::Seek;
+// pub use behavior::Seek;
 
 mod steerable;
 mod steering_behavior;

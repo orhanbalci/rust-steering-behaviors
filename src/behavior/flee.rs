@@ -1,24 +1,27 @@
 use nalgebra::{Vector3, BaseFloat, ApproxEq, Norm, Repeat};
-use super::super::SteeringBehavior;
-use super::super::{SteeringAcceleration, SteeringAccelerationCalculator};
+use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
 
-/// Seek behavior calculates the maximum linear valocity to reach the target location
-pub struct Seek<'a, T: 'a + BaseFloat + ApproxEq<T>> {
-    /// common steering behavior attributes
+/// This behavior is the oppsite of Seek behavior. It produces linear steering acceleration
+/// to go away from target
+pub struct Flee<'a, T: 'a + BaseFloat + ApproxEq<T>> {
+    /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
-    /// steering target
+    /// Target to go away from 
     pub target: Vector3<T>,
 }
 
-impl<'a, T: BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Seek<'a, T> {
+
+impl<'a, T: 'a + BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Flee<'a, T> {
     fn calculate_real_steering<'b>(self: &mut Self,
                                    steering_acceleration: &'b mut SteeringAcceleration<T>)
                                    -> &'b mut SteeringAcceleration<T> {
-        steering_acceleration.linear = (self.target - *self.behavior.owner.get_position())
+
+        steering_acceleration.linear = (*self.behavior.owner.get_position() - self.target)
                                            .normalize() *
                                        Vector3::repeat(self.behavior
                                                            .limiter
                                                            .get_max_linear_acceleration());
+
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }
