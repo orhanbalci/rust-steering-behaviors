@@ -6,3 +6,16 @@ authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 [dependencies]
 nalgebra="*"
 num="*"
+
+[dev-dependencies]
+imgui="*"
+time="*"
+
+[dev-dependencies.glium]
+version="0.14"
+features=["glutin"]
+default-featrues=false
+
+[[examples]]
+name="steering_examples"
+path="examples/steering_examples.rs"
