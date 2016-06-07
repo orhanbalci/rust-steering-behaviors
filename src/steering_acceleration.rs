@@ -80,3 +80,21 @@ pub trait SteeringAccelerationCalculator<T: BaseFloat + ApproxEq<T>> {
                                    -> &'a mut SteeringAcceleration<T>;
     fn is_enabled(self: &Self) -> bool;
 }
+
+#[cfg(test)]
+mod test {
+    use super::SteeringAcceleration;
+    use nalgebra::Vector3;
+    #[test]
+    fn is_zero_positive() {
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 2.0, 3.0), 5.0f32);
+        acceleration.set_zero();
+        assert!(acceleration.is_zero());
+    }
+
+    #[test]
+    fn is_zero_negative(){
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 2.0, 3.0), 5.0f32);
+        assert_eq!(acceleration.is_zero(), false);
+    }
+}

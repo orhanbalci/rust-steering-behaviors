@@ -1,7 +1,7 @@
 use nalgebra::{Vector3, BaseFloat, ApproxEq, Norm, Repeat};
 use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
 
-/// This behavior is the oppsite of Seek behavior. It produces linear steering acceleration
+/// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
 /// to go away from target
 pub struct Flee<'a, T: 'a + BaseFloat + ApproxEq<T>> {
     /// Common behavior attributes
