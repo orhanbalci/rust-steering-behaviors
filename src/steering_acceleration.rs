@@ -3,6 +3,7 @@ use num::Zero;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
+#[derive(Debug)]
 pub struct SteeringAcceleration<T: BaseFloat + ApproxEq<T>> {
     /// linear acceleration component
     pub linear: Vector3<T>,
@@ -65,6 +66,15 @@ impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
     }
 }
 
+impl<T: BaseFloat + ApproxEq<T>> PartialEq for SteeringAcceleration<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.linear == other.linear && self.angular == other.angular
+    }
+    fn ne(&self, other: &Self) -> bool {
+        self.linear != other.linear || self.angular != other.angular
+    }
+}
+
 pub trait SteeringAccelerationCalculator<T: BaseFloat + ApproxEq<T>> {
     fn calculate_steering<'a>(self: &mut Self,
                               steering_acceleration: &'a mut SteeringAcceleration<T>)
@@ -93,8 +103,29 @@ mod test {
     }
 
     #[test]
-    fn is_zero_negative(){
+    fn is_zero_negative() {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 2.0, 3.0), 5.0f32);
         assert_eq!(acceleration.is_zero(), false);
+    }
+
+    #[test]
+    fn add() {
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
+        let acceleration2 = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
+        acceleration.add(acceleration2);
+        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32), acceleration);
+    }
+
+    #[test]
+    fn scl(){
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32,1.0,1.0), 1.0f32);
+        acceleration.scl(2.0f32);
+        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0), acceleration);
+    }
+
+    #[test]
+    fn calculate_square_magnitude(){
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(2.0f32,2.0,2.0), 2.0f32);
+        assert_eq!(16f32, acceleration.calculate_square_magnitude());
     }
 }
