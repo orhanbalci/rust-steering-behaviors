@@ -1,25 +1,54 @@
-use nalgebra::{Vector3, BaseFloat, ApproxEq};
-use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
+use nalgebra::{Vector3, BaseFloat, ApproxEq, FloatPoint, Norm, Repeat};
+use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator,
+                   Steerable};
+use num::Zero;
 
 pub struct Pursue<'a, T: 'a + BaseFloat + ApproxEq<T>> {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// Target to pursue
-    pub target: Vector3<T>,
+    pub target: &'a Steerable<T>,
 
     pub max_prediction_time: T,
 }
 
 
-// impl<'a, T: 'a + BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
-// fn calculate_real_steering<'b>(&mut self,
-//
-// steering_acceleration: &'b mut SteeringAcceleration<T>)
-// -> &'b mut SteeringAcceleration<T> {
-//
-// }
-//
-// fn is_enabled(&self) -> bool {
-// self.behavior.enabled
-// }
-// }
+impl<'a, T: 'a + BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
+    fn calculate_real_steering<'b>(&mut self,
+                                   steering_acceleration: &'b mut SteeringAcceleration<T>)
+                                   -> &'b mut SteeringAcceleration<T> {
+        let square_distance = (*self.target.get_position() - *self.behavior.owner.get_position())
+                                  .as_point()
+                                  .distance_squared(&Vector3::zero().to_point());
+        let square_speed = self.behavior
+                               .owner
+                               .get_linear_velocity()
+                               .as_point()
+                               .distance_squared(Vector3::zero().as_point());
+        let mut prediction_time = self.max_prediction_time;
+        if square_speed > T::zero() {
+            let square_prediction_time = square_distance / square_speed;
+            if square_prediction_time < self.max_prediction_time * self.max_prediction_time {
+                prediction_time = square_prediction_time.sqrt();
+            }
+        }
+
+        steering_acceleration.linear = self.target.get_position().clone();
+        steering_acceleration.mul_add(SteeringAcceleration::new(self.target
+                                                                    .get_linear_velocity()
+                                                                    .clone(),
+                                                                T::zero()),
+                                      prediction_time);
+        steering_acceleration.linear -= *self.behavior.owner.get_position();
+        steering_acceleration.linear = steering_acceleration.linear.normalize();
+        steering_acceleration.linear *= Vector3::repeat(self.behavior
+                                                            .limiter
+                                                            .get_max_linear_acceleration());
+        steering_acceleration.angular = T::zero();
+        steering_acceleration
+    }
+
+    fn is_enabled(&self) -> bool {
+        self.behavior.enabled
+    }
+}
