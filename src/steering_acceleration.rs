@@ -3,7 +3,7 @@ use num::Zero;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct SteeringAcceleration<T: BaseFloat + ApproxEq<T>> {
     /// linear acceleration component
     pub linear: Vector3<T>,
@@ -48,7 +48,7 @@ impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
     }
 
     ///
-    fn mulAdd(self: &mut Self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
+    fn mul_add(self: &mut Self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
         self.angular = self.angular + (other.angular * scale);
         self.linear += other.linear * Vector3::repeat(scale);
         self
@@ -63,15 +63,6 @@ impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
     ///
     fn calculate_magnitude(self: &Self) -> T {
         self.calculate_square_magnitude().sqrt()
-    }
-}
-
-impl<T: BaseFloat + ApproxEq<T>> PartialEq for SteeringAcceleration<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.linear == other.linear && self.angular == other.angular
-    }
-    fn ne(&self, other: &Self) -> bool {
-        self.linear != other.linear || self.angular != other.angular
     }
 }
 
@@ -129,5 +120,20 @@ mod test {
     fn calculate_square_magnitude() {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32);
         assert_eq!(16f32, acceleration.calculate_square_magnitude());
+    }
+
+    #[test]
+    fn calculate_magnitude() {
+        let acceleration = SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32);
+        assert_eq!(4f32, acceleration.calculate_magnitude());
+    }
+
+    #[test]
+    fn mul_add() {
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0);
+        let acceleration2 = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0);
+        acceleration.mul_add(acceleration2, 2.0);
+        assert_eq!(SteeringAcceleration::new(Vector3::new(3.0f32, 3.0, 3.0), 3.0),
+                   acceleration);
     }
 }
