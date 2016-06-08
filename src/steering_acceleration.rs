@@ -113,19 +113,21 @@ mod test {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         let acceleration2 = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         acceleration.add(acceleration2);
-        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32), acceleration);
+        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32),
+                   acceleration);
     }
 
     #[test]
-    fn scl(){
-        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32,1.0,1.0), 1.0f32);
+    fn scl() {
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         acceleration.scl(2.0f32);
-        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0), acceleration);
+        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0),
+                   acceleration);
     }
 
     #[test]
-    fn calculate_square_magnitude(){
-        let mut acceleration = SteeringAcceleration::new(Vector3::new(2.0f32,2.0,2.0), 2.0f32);
+    fn calculate_square_magnitude() {
+        let mut acceleration = SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32);
         assert_eq!(16f32, acceleration.calculate_square_magnitude());
     }
 }
