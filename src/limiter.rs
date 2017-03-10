@@ -1,7 +1,7 @@
-use nalgebra::{BaseFloat, ApproxEq};
+use alga::general::Real;
 
 /// Interface to set limits  on linear and angular speed and acceleration of the agent
-pub trait Limiter<T: BaseFloat + ApproxEq<T>> {
+pub trait Limiter<T: Real> {
     fn get_zero_linear_speed_threshold(self: &Self) -> T;
     fn set_zero_linear_speed_threshold(self: &mut Self, threshold: T);
     fn get_max_linear_sppeed(self: &Self) -> T;

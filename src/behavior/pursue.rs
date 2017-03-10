@@ -1,9 +1,11 @@
-use nalgebra::{Vector3, BaseFloat, ApproxEq, FloatPoint, Norm, Repeat};
+use nalgebra::{Vector3, distance_squared, Point3};
 use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator,
                    Steerable};
-use num::Zero;
+use alga::general::Real;
+use num_traits::identities::Zero;
+use alga::general::AbstractModule;
 
-pub struct Pursue<'a, T: 'a + BaseFloat + ApproxEq<T>> {
+pub struct Pursue<'a, T: 'a + Real> {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// Target to pursue
@@ -13,18 +15,20 @@ pub struct Pursue<'a, T: 'a + BaseFloat + ApproxEq<T>> {
 }
 
 
-impl<'a, T: 'a + BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
+impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
     fn calculate_real_steering<'b>(&mut self,
                                    steering_acceleration: &'b mut SteeringAcceleration<T>)
                                    -> &'b mut SteeringAcceleration<T> {
-        let square_distance = (*self.target.get_position() - *self.behavior.owner.get_position())
-                                  .as_point()
-                                  .distance_squared(&Vector3::zero().to_point());
-        let square_speed = self.behavior
-                               .owner
-                               .get_linear_velocity()
-                               .as_point()
-                               .distance_squared(Vector3::zero().as_point());
+        let square_distance = distance_squared(&Point3::from_coordinates(*self.target
+                                                                              .get_position() -
+                                                                         *self.behavior
+                                                                              .owner
+                                                                              .get_position()),
+                                               &Point3::origin());
+        let square_speed = distance_squared(&Point3::from_coordinates(*self.behavior
+                                                                           .owner
+                                                                           .get_linear_velocity()),
+                                            &Point3::origin());
         let mut prediction_time = self.max_prediction_time;
         if square_speed > T::zero() {
             let square_prediction_time = square_distance / square_speed;
@@ -41,9 +45,10 @@ impl<'a, T: 'a + BaseFloat + ApproxEq<T>> SteeringAccelerationCalculator<T> for 
                                       prediction_time);
         steering_acceleration.linear -= *self.behavior.owner.get_position();
         steering_acceleration.linear = steering_acceleration.linear.normalize();
-        steering_acceleration.linear *= Vector3::repeat(self.behavior
-                                                            .limiter
-                                                            .get_max_linear_acceleration());
+        steering_acceleration.linear =
+            steering_acceleration.linear.multiply_by(self.behavior
+                                                         .limiter
+                                                         .get_max_linear_acceleration());
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }

@@ -1,10 +1,12 @@
-use nalgebra::{Vector3, Repeat, Point3, FloatPoint, BaseFloat, ApproxEq};
-use num::Zero;
+use nalgebra::{Vector3, Point3, distance_squared};
+use alga::general::Real;
+use alga::general::AbstractModule;
+use num_traits::identities::Zero;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
 #[derive(Debug, PartialEq)]
-pub struct SteeringAcceleration<T: BaseFloat + ApproxEq<T>> {
+pub struct SteeringAcceleration<T: Real> {
     /// linear acceleration component
     pub linear: Vector3<T>,
     /// angular acceleration component
@@ -12,7 +14,7 @@ pub struct SteeringAcceleration<T: BaseFloat + ApproxEq<T>> {
 }
 
 
-impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
+impl<T: Real> SteeringAcceleration<T> {
     /// Creates a steering acceleration struct using given linear and angular components
     pub fn new(linear_acceleration: Vector3<T>,
                angular_acceleration: T)
@@ -45,20 +47,20 @@ impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
     ///
     pub fn scl(self: &mut Self, scale: T) -> &mut Self {
         self.angular = self.angular * scale;
-        self.linear *= Vector3::repeat(scale);
+        self.linear = self.linear.multiply_by(scale);
         self
     }
 
     ///
     pub fn mul_add(self: &mut Self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
         self.angular = self.angular + (other.angular * scale);
-        self.linear += other.linear * Vector3::repeat(scale);
+        self.linear += other.linear.multiply_by(scale);
         self
     }
 
     ///
     pub fn calculate_square_magnitude(self: &Self) -> T {
-        self.linear.as_point().distance_squared(&Vector3::zero().to_point()) +
+        distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin()) +
         self.angular * self.angular
     }
 
@@ -68,7 +70,7 @@ impl<T: BaseFloat + ApproxEq<T>> SteeringAcceleration<T> {
     }
 }
 
-pub trait SteeringAccelerationCalculator<T: BaseFloat + ApproxEq<T>> {
+pub trait SteeringAccelerationCalculator<T: Real> {
     fn calculate_steering<'a>(self: &mut Self,
                               steering_acceleration: &'a mut SteeringAcceleration<T>)
                               -> &'a mut SteeringAcceleration<T> {

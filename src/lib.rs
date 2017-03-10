@@ -1,5 +1,6 @@
 extern crate nalgebra;
-extern crate num;
+extern crate alga;
+extern crate num_traits;
 
 pub use self::steerable::Steerable;
 pub use self::steering_behavior::SteeringBehavior;
