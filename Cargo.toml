@@ -10,3 +10,4 @@ alga="*"
 
 [dev-dependencies]
 tui="*"
+termion="*"
