@@ -5,5 +5,8 @@ authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 
 [dependencies]
 nalgebra="*"
-alga="*"
 num-traits="*"
+alga="*"
+
+[dev-dependencies]
+tui="*"
