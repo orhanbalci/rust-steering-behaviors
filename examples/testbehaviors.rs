@@ -12,6 +12,7 @@ use termion::input::TermRead;
 use tui::Terminal;
 use tui::backend::TermionBackend;
 use tui::widgets::{Widget, Block, border, SelectableList, List};
+use tui::widgets::canvas::{Canvas, Map, MapResolution, Line};
 use tui::layout::{Group, Direction, Size};
 use tui::style::{Style, Color, Modifier};
 
@@ -28,10 +29,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     fn new() -> App<'a> {
         App {
-            items: vec!["Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8",
-                        "Item9", "Item10", "Item11", "Item12", "Item13", "Item14", "Item15",
-                        "Item16", "Item17", "Item18", "Item19", "Item20", "Item21", "Item22",
-                        "Item23", "Item24"],
+            items: vec!["Seek", "Flee", "Pursue"],
             selected: 0,
             events: vec![("Event1", "INFO"),
                          ("Event2", "INFO"),
@@ -154,34 +152,49 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App) {
     let size = t.size().unwrap();
 
     Group::default()
-        .direction(Direction::Horizontal)
-        .sizes(&[Size::Percent(50), Size::Percent(50)])
+        .direction(Direction::Vertical)
+        .sizes(&[Size::Percent(90), Size::Percent(10)])
         .render(t, &size, |t, chunks| {
-            SelectableList::default()
-                .block(Block::default()
-                    .borders(border::ALL)
-                    .title("List"))
-                .items(&app.items)
-                .select(app.selected)
-                .highlight_style(Style::default().fg(Color::Yellow).modifier(Modifier::Bold))
-                .highlight_symbol(">")
-                .render(t, &chunks[0]);
-            List::default()
-                .block(Block::default()
-                    .borders(border::ALL)
-                    .title("List"))
-                .items(&app.events
-                    .iter()
-                    .map(|&(evt, level)| {
-                        (format!("{}: {}", level, evt),
-                         match level {
-                            "ERROR" => &app.error_style,
-                            "CRITICAL" => &app.critical_style,
-                            "WARNING" => &app.warning_style,
-                            _ => &app.info_style,
+            Group::default()
+                .direction(Direction::Horizontal)
+                .sizes(&[Size::Percent(15), Size::Percent(85)])
+                .render(t, &chunks[0], |t, chunks|{
+                    SelectableList::default()
+                        .block(Block::default()
+                               .borders(border::ALL)
+                               .title("Steering Behaviors")
+                              )
+                        .items(&app.items)
+                        .select(app.selected)
+                        .highlight_style(Style::default().fg(Color::Yellow).modifier(Modifier::Bold))
+                        .highlight_symbol(">")
+                        .render(t, &chunks[0]);
+                    
+                    Canvas::default()
+                        .block(Block::default()
+                               .borders(border::ALL)
+                               .title("Steering Actors")
+                              )
+                        .paint(|ctx|{
+                            ctx.draw(&Map{
+                                color : Color::Red,
+                                resolution : MapResolution::High,
+                            });
                         })
-                    })
-                    .collect::<Vec<(String, &Style)>>())
+                        .x_bounds([-180.0, 180.0])
+                        .y_bounds([-90.0,  90.0])
+                        .render(t,&chunks[1]);
+                });
+            
+            Block::default()
+                .borders(border::ALL)
+                .title("Instructions")
+                .title_style(
+                    Style::default()
+                    .fg(Color::White)
+                    .bg(Color::Red)
+                    .modifier(Modifier::Bold)
+                            )
                 .render(t, &chunks[1]);
         });
 
