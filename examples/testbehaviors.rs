@@ -1,5 +1,7 @@
 extern crate tui;
 extern crate termion;
+extern crate nalgebra;
+extern crate steering;
 
 use std::io;
 use std::thread;
@@ -15,6 +17,10 @@ use tui::widgets::{Widget, Block, border, SelectableList, List};
 use tui::widgets::canvas::{Canvas, Map, MapResolution, Line};
 use tui::layout::{Group, Direction, Size};
 use tui::style::{Style, Color, Modifier};
+
+use nalgebra::Vector3;
+
+use steering::Steerable;
 
 struct App<'a> {
     items: Vec<&'a str>,
@@ -73,6 +79,35 @@ impl<'a> App<'a> {
 enum Event {
     Input(event::Key),
     Tick,
+}
+
+struct Target{
+    position : Vector3<f32>
+}
+
+struct Vehicle{
+    linear_velocity : Vector3<f32>,
+    position : Vector3<f32>,
+    angular_velocity : f32,
+    bounding_radius : f32,
+}
+
+impl Steerable<f32> for Vehicle{
+    fn get_linear_velocity(&self) -> &Vector3<f32>{
+        &self.linear_velocity
+    }
+
+    fn get_angular_velocity(&self) -> f32 {
+        self.angular_velocity
+    }
+
+    fn get_bounding_radius(&self) -> f32 {
+        self.bounding_radius
+    }
+
+    fn get_position(&self) -> &Vector3<f32> {
+        &self.position
+    }
 }
 
 fn main() {
