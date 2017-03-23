@@ -2,7 +2,6 @@ use nalgebra::{Vector3, distance_squared, Point3};
 use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator,
                    Steerable};
 use alga::general::Real;
-use num_traits::identities::Zero;
 use alga::general::AbstractModule;
 
 pub struct Pursue<'a, T: 'a + Real> {
@@ -46,9 +45,11 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
         steering_acceleration.linear -= *self.behavior.owner.get_position();
         steering_acceleration.linear = steering_acceleration.linear.normalize();
         steering_acceleration.linear =
-            steering_acceleration.linear.multiply_by(self.behavior
-                                                         .limiter
-                                                         .get_max_linear_acceleration());
+            steering_acceleration.linear.multiply_by(match self.behavior
+                                                               .limiter {
+                Some(a) => (*a).get_max_linear_acceleration(),
+                None => T::one(),
+            });
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }

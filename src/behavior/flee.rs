@@ -20,9 +20,11 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Flee<'a, T> {
 
         steering_acceleration.linear = (*self.behavior.owner.get_position() - self.target)
                                            .normalize()
-                                           .multiply_by(self.behavior
-                                                            .limiter
-                                                            .get_max_linear_acceleration());
+                                           .multiply_by(match self.behavior
+                                                                  .limiter {
+                                               Some(l) => (*l).get_max_linear_acceleration(),
+                                               None => T::one(),
+                                           });
 
         steering_acceleration.angular = T::zero();
         steering_acceleration

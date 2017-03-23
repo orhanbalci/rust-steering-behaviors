@@ -3,7 +3,6 @@ use super::super::SteeringBehavior;
 use super::super::{SteeringAcceleration, SteeringAccelerationCalculator};
 use alga::general::Real;
 use alga::general::AbstractModule;
-use num_traits::identities::Zero;
 
 /// Seek behavior calculates the maximum linear valocity to reach the target location
 pub struct Seek<'a, T: 'a + Real> {
@@ -19,9 +18,11 @@ impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
                                    -> &'b mut SteeringAcceleration<T> {
         steering_acceleration.linear = (self.target - *self.behavior.owner.get_position())
                                            .normalize()
-                                           .multiply_by(self.behavior
-                                                            .limiter
-                                                            .get_max_linear_acceleration());
+                                           .multiply_by(match self.behavior
+                                                                  .limiter {
+                                               Some(a) => (*a).get_max_linear_acceleration(),
+                                               None => T::one(),
+                                           });
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }

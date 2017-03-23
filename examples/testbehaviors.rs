@@ -24,6 +24,8 @@ use alga::general::AbstractModule;
 use steering::Steerable;
 use steering::SteeringAcceleration;
 use steering::Seek;
+use steering::SteeringAccelerationCalculator;
+use steering::SteeringBehavior;
 
 struct App<'a> {
     items: Vec<&'a str>,
@@ -33,6 +35,8 @@ struct App<'a> {
     warning_style: Style,
     error_style: Style,
     critical_style: Style,
+    v : Vehicle<'a>,
+    t : Target,
 }
 
 impl<'a> App<'a> {
@@ -70,6 +74,8 @@ impl<'a> App<'a> {
             warning_style: Style::default().fg(Color::Yellow),
             error_style: Style::default().fg(Color::Magenta),
             critical_style: Style::default().fg(Color::Red),
+            v: Vehicle::new(),
+            t : Target::new(),
         }
     }
 
@@ -85,7 +91,7 @@ enum Event {
 }
 
 struct Target{
-    position : Vector3<f32>
+   pub  position : Vector3<f32>
 }
 
 impl Target{
@@ -96,14 +102,15 @@ impl Target{
     }
 }
 
-struct Vehicle{
+struct Vehicle<'a>{
     linear_velocity : Vector3<f32>,
     position : Vector3<f32>,
     angular_velocity : f32,
     bounding_radius : f32,
+    behavior : &'a (SteeringAccelerationCalculator<f32> + 'a),
 }
 
-impl Steerable<f32> for Vehicle{
+impl<'a> Steerable<f32> for Vehicle<'a>{
     fn get_linear_velocity(&self) -> &Vector3<f32>{
         &self.linear_velocity
     }
@@ -121,13 +128,21 @@ impl Steerable<f32> for Vehicle{
     }
 }
 
-impl Vehicle{
+impl<'a> Vehicle<'a>{
     fn new() -> Self {
         Vehicle{
             linear_velocity : Vector3::new(1.0, 0.0, 0.0),
             position  : Vector3::new(-10.0, 0.0, 0.0),
             angular_velocity : 0.0,
             bounding_radius : 2.0,
+             behavior :  &Seek{
+                behavior : SteeringBehavior{
+                    owner : &self,
+                    enabled : true,
+                    limiter : None,
+                },
+                target : Vector3::new(0.0, 0.0, 0.0),
+            },
         }
     }
     fn advance(&mut self, milis : f32){
@@ -139,12 +154,6 @@ fn main() {
     // Terminal initialization
     let backend = TermionBackend::new().unwrap();
     let mut terminal = Terminal::new(backend).unwrap();
-
-    //target and steerable actors
-    let t = Target::new();
-    let mut v = Vehicle::new();
-
-    // Channels
     let (tx, rx) = mpsc::channel();
     let input_tx = tx.clone();
     let clock_tx = tx.clone();

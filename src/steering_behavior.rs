@@ -9,5 +9,5 @@ pub struct SteeringBehavior<'a, T: 'a + Real> {
     /// is this behavior enabled
     pub enabled: bool,
     /// limitations on speed and velocity calculations
-    pub limiter: &'a Limiter<T>,
+    pub limiter: Option<&'a Limiter<T>>,
 }
