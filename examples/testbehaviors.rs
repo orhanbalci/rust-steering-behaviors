@@ -2,6 +2,7 @@ extern crate tui;
 extern crate termion;
 extern crate nalgebra;
 extern crate steering;
+extern crate alga;
 
 use std::io;
 use std::thread;
@@ -19,8 +20,10 @@ use tui::layout::{Group, Direction, Size};
 use tui::style::{Style, Color, Modifier};
 
 use nalgebra::Vector3;
-
+use alga::general::AbstractModule;
 use steering::Steerable;
+use steering::SteeringAcceleration;
+use steering::Seek;
 
 struct App<'a> {
     items: Vec<&'a str>,
@@ -85,6 +88,14 @@ struct Target{
     position : Vector3<f32>
 }
 
+impl Target{
+    fn new()->Self{
+        Target{
+            position : Vector3::new(0.0,0.0,0.0),
+        }
+    }
+}
+
 struct Vehicle{
     linear_velocity : Vector3<f32>,
     position : Vector3<f32>,
@@ -110,10 +121,28 @@ impl Steerable<f32> for Vehicle{
     }
 }
 
+impl Vehicle{
+    fn new() -> Self {
+        Vehicle{
+            linear_velocity : Vector3::new(1.0, 0.0, 0.0),
+            position  : Vector3::new(-10.0, 0.0, 0.0),
+            angular_velocity : 0.0,
+            bounding_radius : 2.0,
+        }
+    }
+    fn advance(&mut self, milis : f32){
+        self.position = self.position + self.linear_velocity.multiply_by(milis/1000.0);
+    }
+}
+
 fn main() {
     // Terminal initialization
     let backend = TermionBackend::new().unwrap();
     let mut terminal = Terminal::new(backend).unwrap();
+
+    //target and steerable actors
+    let t = Target::new();
+    let mut v = Vehicle::new();
 
     // Channels
     let (tx, rx) = mpsc::channel();
