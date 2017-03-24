@@ -16,10 +16,10 @@ pub struct SteeringAcceleration<T: Real> {
 
 
 impl<T: Real> SteeringAcceleration<T> {
-    pub fn default()->SteeringAcceleration<T>{
-        SteeringAcceleration{
-            linear : Vector3::new(T::zero(),T::zero(),T::zero()),
-            angular : T::zero(),
+    pub fn default() -> SteeringAcceleration<T> {
+        SteeringAcceleration {
+            linear: Vector3::new(T::zero(), T::zero(), T::zero()),
+            angular: T::zero(),
         }
     }
     /// Creates a steering acceleration struct using given linear and angular components
@@ -93,6 +93,7 @@ pub trait SteeringAccelerationCalculator<T: Real> {
                                    owner: &'a Steerable<T>)
                                    -> &'a mut SteeringAcceleration<T>;
     fn is_enabled(self: &Self) -> bool;
+    // fn set_enabled(&mut self, is_enabled : bool);
 }
 
 #[cfg(test)]

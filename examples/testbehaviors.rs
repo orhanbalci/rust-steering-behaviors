@@ -36,8 +36,7 @@ struct App<'a> {
     error_style: Style,
     critical_style: Style,
     v: Vehicle,
-    t: Target,
-    behavior : Option<&'a mut SteeringAccelerationCalculator<f32>>,
+    behavior: Option<&'a mut SteeringAccelerationCalculator<f32>>,
 }
 
 impl<'a> App<'a> {
@@ -76,33 +75,23 @@ impl<'a> App<'a> {
             error_style: Style::default().fg(Color::Magenta),
             critical_style: Style::default().fg(Color::Red),
             v: Vehicle::new(),
-            t: Target::new(),
-            behavior : None,
-
+            behavior: None,
         }
     }
 
     fn advance(&mut self) {
         let event = self.events.pop().unwrap();
         self.events.insert(0, event);
-        let a : &mut SteeringAccelerationCalculator<f32> = self.behavior.unwrap();
-        self.v.advance(a,100f32);
+        match self.behavior {
+            Some(ref mut a) => self.v.advance(*a, 100f32),
+            None => (), 
+        }
     }
 }
 
 enum Event {
     Input(event::Key),
     Tick,
-}
-
-struct Target {
-    pub position: Vector3<f32>,
-}
-
-impl Target {
-    fn new() -> Self {
-        Target { position: Vector3::new(0.0, 0.0, 0.0) }
-    }
 }
 
 struct Vehicle {
@@ -140,7 +129,7 @@ impl Vehicle {
         }
     }
 
-    fn advance(&mut self, calc : &mut SteeringAccelerationCalculator<f32>, milis: f32) {
+    fn advance(&mut self, calc: &mut SteeringAccelerationCalculator<f32>, milis: f32) {
         let mut sa = SteeringAcceleration::default();
         calc.calculate_steering(&mut sa, self);
         self.linear_velocity += sa.linear;
@@ -178,12 +167,13 @@ fn main() {
     });
 
     // App
-    let mut behavior =  Seek {
+    let mut target = Vehicle::new();
+    let mut behavior = Seek {
         behavior: SteeringBehavior {
             enabled: true,
             limiter: None,
         },
-        target: Vector3::new(0.0,0.0,0.0), 
+        target: &target,
     };
     let mut app = App::new();
     app.behavior = Some(&mut behavior);
@@ -217,6 +207,7 @@ fn main() {
                 }
             }
             Event::Tick => {
+                // target.advance();
                 app.advance();
             }
         }

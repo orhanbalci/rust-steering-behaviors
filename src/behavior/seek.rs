@@ -13,7 +13,7 @@ pub struct Seek<'a, T>
     /// common steering behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// steering target
-    pub target: Vector3<T>,
+    pub target: &'a Steerable<T>,
 }
 
 impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
@@ -21,7 +21,7 @@ impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
                                    steering_acceleration: &'b mut SteeringAcceleration<T>,
                                    owner: &'b Steerable<T>)
                                    -> &'b mut SteeringAcceleration<T> {
-        steering_acceleration.linear = (self.target - *owner.get_position())
+        steering_acceleration.linear = (*self.target.get_position() - *owner.get_position())
                                            .normalize()
                                            .multiply_by(match self.behavior
                                                                   .limiter {
