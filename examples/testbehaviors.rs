@@ -35,8 +35,8 @@ struct App<'a> {
     warning_style: Style,
     error_style: Style,
     critical_style: Style,
-    v : Vehicle<'a>,
-    t : Target,
+    v: Vehicle,
+    t: Target,
 }
 
 impl<'a> App<'a> {
@@ -75,7 +75,7 @@ impl<'a> App<'a> {
             error_style: Style::default().fg(Color::Magenta),
             critical_style: Style::default().fg(Color::Red),
             v: Vehicle::new(),
-            t : Target::new(),
+            t: Target::new(),
         }
     }
 
@@ -90,28 +90,25 @@ enum Event {
     Tick,
 }
 
-struct Target{
-   pub  position : Vector3<f32>
+struct Target {
+    pub position: Vector3<f32>,
 }
 
-impl Target{
-    fn new()->Self{
-        Target{
-            position : Vector3::new(0.0,0.0,0.0),
-        }
+impl Target {
+    fn new() -> Self {
+        Target { position: Vector3::new(0.0, 0.0, 0.0) }
     }
 }
 
-struct Vehicle<'a>{
-    linear_velocity : Vector3<f32>,
-    position : Vector3<f32>,
-    angular_velocity : f32,
-    bounding_radius : f32,
-    behavior : &'a (SteeringAccelerationCalculator<f32> + 'a),
+struct Vehicle {
+    linear_velocity: Vector3<f32>,
+    position: Vector3<f32>,
+    angular_velocity: f32,
+    bounding_radius: f32,
 }
 
-impl<'a> Steerable<f32> for Vehicle<'a>{
-    fn get_linear_velocity(&self) -> &Vector3<f32>{
+impl Steerable<f32> for Vehicle {
+    fn get_linear_velocity(&self) -> &Vector3<f32> {
         &self.linear_velocity
     }
 
@@ -128,25 +125,18 @@ impl<'a> Steerable<f32> for Vehicle<'a>{
     }
 }
 
-impl<'a> Vehicle<'a>{
+impl Vehicle {
     fn new() -> Self {
-        Vehicle{
-            linear_velocity : Vector3::new(1.0, 0.0, 0.0),
-            position  : Vector3::new(-10.0, 0.0, 0.0),
-            angular_velocity : 0.0,
-            bounding_radius : 2.0,
-             behavior :  &Seek{
-                behavior : SteeringBehavior{
-                    owner : &self,
-                    enabled : true,
-                    limiter : None,
-                },
-                target : Vector3::new(0.0, 0.0, 0.0),
-            },
+        Vehicle {
+            linear_velocity: Vector3::new(1.0, 0.0, 0.0),
+            position: Vector3::new(-10.0, 0.0, 0.0),
+            angular_velocity: 0.0,
+            bounding_radius: 2.0,
         }
     }
-    fn advance(&mut self, milis : f32){
-        self.position = self.position + self.linear_velocity.multiply_by(milis/1000.0);
+
+    fn advance(&mut self, milis: f32) {
+        self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
 }
 
@@ -180,7 +170,13 @@ fn main() {
 
     // App
     let mut app = App::new();
-
+    let mut behavior = Seek {
+        behavior: SteeringBehavior {
+            enabled: true,
+            limiter: None,
+        },
+        target: app.t.position,
+    };
     // First draw call
     terminal.clear().unwrap();
     terminal.hide_cursor().unwrap();
@@ -231,43 +227,41 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App) {
             Group::default()
                 .direction(Direction::Horizontal)
                 .sizes(&[Size::Percent(15), Size::Percent(85)])
-                .render(t, &chunks[0], |t, chunks|{
+                .render(t, &chunks[0], |t, chunks| {
                     SelectableList::default()
                         .block(Block::default()
-                               .borders(border::ALL)
-                               .title("Steering Behaviors")
-                              )
+                                   .borders(border::ALL)
+                                   .title("Steering Behaviors"))
                         .items(&app.items)
                         .select(app.selected)
-                        .highlight_style(Style::default().fg(Color::Yellow).modifier(Modifier::Bold))
+                        .highlight_style(Style::default()
+                                             .fg(Color::Yellow)
+                                             .modifier(Modifier::Bold))
                         .highlight_symbol(">")
                         .render(t, &chunks[0]);
-                    
+
                     Canvas::default()
                         .block(Block::default()
-                               .borders(border::ALL)
-                               .title("Steering Actors")
-                              )
-                        .paint(|ctx|{
-                            ctx.draw(&Map{
-                                color : Color::Red,
-                                resolution : MapResolution::High,
+                                   .borders(border::ALL)
+                                   .title("Steering Actors"))
+                        .paint(|ctx| {
+                            ctx.draw(&Map {
+                                color: Color::Red,
+                                resolution: MapResolution::High,
                             });
                         })
                         .x_bounds([-180.0, 180.0])
-                        .y_bounds([-90.0,  90.0])
-                        .render(t,&chunks[1]);
+                        .y_bounds([-90.0, 90.0])
+                        .render(t, &chunks[1]);
                 });
-            
+
             Block::default()
                 .borders(border::ALL)
                 .title("Instructions")
-                .title_style(
-                    Style::default()
-                    .fg(Color::White)
-                    .bg(Color::Red)
-                    .modifier(Modifier::Bold)
-                            )
+                .title_style(Style::default()
+                                 .fg(Color::White)
+                                 .bg(Color::Red)
+                                 .modifier(Modifier::Bold))
                 .render(t, &chunks[1]);
         });
 
