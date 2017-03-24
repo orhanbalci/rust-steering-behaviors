@@ -2,6 +2,7 @@ use nalgebra::{Vector3, Point3, distance_squared};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use num_traits::identities::Zero;
+use Steerable;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
@@ -72,16 +73,18 @@ impl<T: Real> SteeringAcceleration<T> {
 
 pub trait SteeringAccelerationCalculator<T: Real> {
     fn calculate_steering<'a>(self: &mut Self,
-                              steering_acceleration: &'a mut SteeringAcceleration<T>)
+                              steering_acceleration: &'a mut SteeringAcceleration<T>,
+                              owner: &'a Steerable<T>)
                               -> &'a mut SteeringAcceleration<T> {
         if self.is_enabled() {
-            self.calculate_real_steering(steering_acceleration)
+            self.calculate_real_steering(steering_acceleration, owner)
         } else {
             steering_acceleration.set_zero()
         }
     }
     fn calculate_real_steering<'a>(self: &mut Self,
-                                   steering_acceleration: &'a mut SteeringAcceleration<T>)
+                                   steering_acceleration: &'a mut SteeringAcceleration<T>,
+                                   owner: &'a Steerable<T>)
                                    -> &'a mut SteeringAcceleration<T>;
     fn is_enabled(self: &Self) -> bool;
 }
