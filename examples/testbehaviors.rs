@@ -37,6 +37,7 @@ struct App<'a> {
     critical_style: Style,
     v: Vehicle,
     t: Target,
+    behavior : Option<&'a mut SteeringAccelerationCalculator<f32>>,
 }
 
 impl<'a> App<'a> {
@@ -76,12 +77,16 @@ impl<'a> App<'a> {
             critical_style: Style::default().fg(Color::Red),
             v: Vehicle::new(),
             t: Target::new(),
+            behavior : None,
+
         }
     }
 
     fn advance(&mut self) {
         let event = self.events.pop().unwrap();
         self.events.insert(0, event);
+        let a : &mut SteeringAccelerationCalculator<f32> = self.behavior.unwrap();
+        self.v.advance(a,100f32);
     }
 }
 
@@ -135,7 +140,11 @@ impl Vehicle {
         }
     }
 
-    fn advance(&mut self, milis: f32) {
+    fn advance(&mut self, calc : &mut SteeringAccelerationCalculator<f32>, milis: f32) {
+        let mut sa = SteeringAcceleration::default();
+        calc.calculate_steering(&mut sa, self);
+        self.linear_velocity += sa.linear;
+        self.angular_velocity += sa.angular;
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
 }
@@ -169,14 +178,15 @@ fn main() {
     });
 
     // App
-    let mut app = App::new();
-    let mut behavior = Seek {
+    let mut behavior =  Seek {
         behavior: SteeringBehavior {
             enabled: true,
             limiter: None,
         },
-        target: app.t.position,
+        target: Vector3::new(0.0,0.0,0.0), 
     };
+    let mut app = App::new();
+    app.behavior = Some(&mut behavior);
     // First draw call
     terminal.clear().unwrap();
     terminal.hide_cursor().unwrap();

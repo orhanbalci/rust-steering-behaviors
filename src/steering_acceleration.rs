@@ -16,6 +16,12 @@ pub struct SteeringAcceleration<T: Real> {
 
 
 impl<T: Real> SteeringAcceleration<T> {
+    pub fn default()->SteeringAcceleration<T>{
+        SteeringAcceleration{
+            linear : Vector3::new(T::zero(),T::zero(),T::zero()),
+            angular : T::zero(),
+        }
+    }
     /// Creates a steering acceleration struct using given linear and angular components
     pub fn new(linear_acceleration: Vector3<T>,
                angular_acceleration: T)
