@@ -3,7 +3,8 @@ use limiter::Limiter;
 use alga::general::Real;
 
 /// Common properties of steering behaviors 
-pub struct SteeringBehavior<'a, T: 'a + Real> {
+#[derive(Builder, Clone)]
+pub struct SteeringBehavior<'a, T> where T: 'a + Real{
     /// ownew of this behavior upon which the calculations will occur
     pub owner: &'a Steerable<T>,
     /// is this behavior enabled

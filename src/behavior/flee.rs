@@ -5,7 +5,8 @@ use alga::general::AbstractModule;
 
 /// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
 /// to go away from target
-pub struct Flee<'a, T: 'a + Real> {
+#[derive(Builder)]
+pub struct Flee<'a, T> where T: 'a + Real{
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// Target to go away from 

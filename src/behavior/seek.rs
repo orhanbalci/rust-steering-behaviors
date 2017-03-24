@@ -5,7 +5,8 @@ use alga::general::Real;
 use alga::general::AbstractModule;
 
 /// Seek behavior calculates the maximum linear valocity to reach the target location
-pub struct Seek<'a, T: 'a + Real> {
+#[derive(Builder)]
+pub struct Seek<'a, T> where T: 'a + Real{
     /// common steering behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// steering target

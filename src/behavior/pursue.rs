@@ -4,7 +4,8 @@ use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationC
 use alga::general::Real;
 use alga::general::AbstractModule;
 
-pub struct Pursue<'a, T: 'a + Real> {
+#[derive(Builder)]
+pub struct Pursue<'a, T> where T: 'a + Real{
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
     /// Target to pursue

@@ -1,13 +1,14 @@
 [package]
+authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 name = "steering"
 version = "0.1.0"
-authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 
 [dependencies]
-nalgebra="*"
-num-traits="*"
-alga="*"
+alga = "*"
+derive_builder = "0.3.0"
+nalgebra = "*"
+num-traits = "*"
 
 [dev-dependencies]
-tui="*"
-termion="*"
+termion = "*"
+tui = "*"
