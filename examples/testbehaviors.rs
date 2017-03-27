@@ -182,16 +182,36 @@ fn main() {
         angular_velocity: 0.0,
         bounding_radius: 2.0,
     };
-    let mut behavior = Pursue {
+
+    let mut pursue  = Pursue {
         behavior: SteeringBehavior {
             enabled: true,
             limiter: None,
         },
         target: &target,
-        max_prediction_time : 100.0f32,
+        max_prediction_time: 100.0f32,
     };
+    let mut seek = Seek {
+        behavior : SteeringBehavior {
+            enabled : true,
+            limiter : None,
+        },
+        target : &target,
+    };
+    let mut flee = Flee{
+        behavior : SteeringBehavior {
+            enabled : true,
+            limiter : None,
+        },
+        target : &target,
+    };
+    let mut behaviors : Vec<&mut SteeringAccelerationCalculator<f32>> = vec![];
+    behaviors.push(&mut seek);
+    behaviors.push(&mut flee);
+    behaviors.push(&mut pursue);
+
     let mut app = App::new();
-    app.behavior = Some(&mut behavior);
+    app.behavior = Some(behaviors[0].copy());
     // First draw call
     terminal.clear().unwrap();
     terminal.hide_cursor().unwrap();
@@ -226,6 +246,7 @@ fn main() {
                 app.advance();
             }
         }
+        app.behavior = Some(behaviors[app.selected]);
         draw(&mut terminal, &app, &target);
     }
 
@@ -269,7 +290,8 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
                                 y2: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
                                 color: Color::Red,
                             });
-                            ctx.draw(&Line { x1: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
+                            ctx.draw(&Line {
+                                x1: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
                                 y1: (app.v.get_position().as_slice()[1] - 10.0f32) as f64,
                                 x2: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
                                 y2: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
@@ -297,7 +319,7 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
                                 y2: (target.get_position().as_slice()[1] + 10.0f32) as f64,
                                 color: Color::Green,
                             });
-                            ctx.draw(&Line { 
+                            ctx.draw(&Line {
                                 x1: (target.get_position().as_slice()[0] + 10.0f32) as f64,
                                 y1: (target.get_position().as_slice()[1] - 10.0f32) as f64,
                                 x2: (target.get_position().as_slice()[0] + 10.0f32) as f64,
