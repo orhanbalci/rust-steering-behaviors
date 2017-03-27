@@ -24,6 +24,8 @@ use alga::general::AbstractModule;
 use steering::Steerable;
 use steering::SteeringAcceleration;
 use steering::Seek;
+use steering::Flee;
+use steering::Pursue;
 use steering::SteeringAccelerationCalculator;
 use steering::SteeringBehavior;
 
@@ -85,7 +87,7 @@ impl<'a> App<'a> {
         let event = self.events.pop().unwrap();
         self.events.insert(0, event);
         match self.behavior {
-            Some(ref mut a) => self.v.advance(*a, 100f32),
+            Some(ref mut a) => self.v.advance(*a, 500f32),
             None => (), 
         };
         self.positions.clear();
@@ -180,12 +182,13 @@ fn main() {
         angular_velocity: 0.0,
         bounding_radius: 2.0,
     };
-    let mut behavior = Seek {
+    let mut behavior = Pursue {
         behavior: SteeringBehavior {
             enabled: true,
             limiter: None,
         },
         target: &target,
+        max_prediction_time : 100.0f32,
     };
     let mut app = App::new();
     app.behavior = Some(&mut behavior);
@@ -219,7 +222,7 @@ fn main() {
                 }
             }
             Event::Tick => {
-                // target.advance();
+                // target.advance(,100.0f32);
                 app.advance();
             }
         }
