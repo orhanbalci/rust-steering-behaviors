@@ -38,7 +38,7 @@ struct App<'a> {
     error_style: Style,
     critical_style: Style,
     v: Vehicle,
-    behavior: Option<&'a mut SteeringAccelerationCalculator<f32>>,
+    behavior: Option<&'a SteeringAccelerationCalculator<f32>>,
     positions: Vec<String>,
 }
 
@@ -87,7 +87,7 @@ impl<'a> App<'a> {
         let event = self.events.pop().unwrap();
         self.events.insert(0, event);
         match self.behavior {
-            Some(ref mut a) => self.v.advance(*a, 500f32),
+            Some(ref  a) => self.v.advance(*a, 500f32),
             None => (), 
         };
         self.positions.clear();
@@ -138,7 +138,7 @@ impl Vehicle {
         }
     }
 
-    fn advance(&mut self, calc: &mut SteeringAccelerationCalculator<f32>, milis: f32) {
+    fn advance(&mut self, calc: &SteeringAccelerationCalculator<f32>, milis: f32) {
         let mut sa = SteeringAcceleration::default();
         calc.calculate_steering(&mut sa, self);
         self.linear_velocity += sa.linear;
@@ -183,7 +183,7 @@ fn main() {
         bounding_radius: 2.0,
     };
 
-    let mut pursue  = Pursue {
+    let pursue  = Pursue {
         behavior: SteeringBehavior {
             enabled: true,
             limiter: None,
@@ -191,27 +191,27 @@ fn main() {
         target: &target,
         max_prediction_time: 100.0f32,
     };
-    let mut seek = Seek {
+    let  seek = Seek {
         behavior : SteeringBehavior {
             enabled : true,
             limiter : None,
         },
         target : &target,
     };
-    let mut flee = Flee{
+    let  flee = Flee{
         behavior : SteeringBehavior {
             enabled : true,
             limiter : None,
         },
         target : &target,
     };
-    let mut behaviors : Vec<&mut SteeringAccelerationCalculator<f32>> = vec![];
-    behaviors.push(&mut seek);
-    behaviors.push(&mut flee);
-    behaviors.push(&mut pursue);
+    let mut behaviors : Vec<&SteeringAccelerationCalculator<f32>> = vec![];
+    behaviors.push(&seek);
+    behaviors.push(&flee);
+    behaviors.push(&pursue);
 
     let mut app = App::new();
-    app.behavior = Some(behaviors[0].copy());
+    app.behavior = Some(behaviors[0]); 
     // First draw call
     terminal.clear().unwrap();
     terminal.hide_cursor().unwrap();

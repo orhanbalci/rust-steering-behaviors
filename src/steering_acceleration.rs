@@ -78,7 +78,7 @@ impl<T: Real> SteeringAcceleration<T> {
 }
 
 pub trait SteeringAccelerationCalculator<T: Real> {
-    fn calculate_steering<'a>(self: &mut Self,
+    fn calculate_steering<'a>(&self,
                               steering_acceleration: &'a mut SteeringAcceleration<T>,
                               owner: &'a Steerable<T>)
                               -> &'a mut SteeringAcceleration<T> {
@@ -88,7 +88,7 @@ pub trait SteeringAccelerationCalculator<T: Real> {
             steering_acceleration.set_zero()
         }
     }
-    fn calculate_real_steering<'a>(self: &mut Self,
+    fn calculate_real_steering<'a>(&self,
                                    steering_acceleration: &'a mut SteeringAcceleration<T>,
                                    owner: &'a Steerable<T>)
                                    -> &'a mut SteeringAcceleration<T>;

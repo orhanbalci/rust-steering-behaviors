@@ -1,4 +1,3 @@
-use nalgebra::Vector3;
 use super::super::SteeringBehavior;
 use super::super::{SteeringAcceleration, SteeringAccelerationCalculator};
 use alga::general::Real;
@@ -17,7 +16,7 @@ pub struct Seek<'a, T>
 }
 
 impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
-    fn calculate_real_steering<'b>(self: &mut Self,
+    fn calculate_real_steering<'b>(&self,
                                    steering_acceleration: &'b mut SteeringAcceleration<T>,
                                    owner: &'b Steerable<T>)
                                    -> &'b mut SteeringAcceleration<T> {

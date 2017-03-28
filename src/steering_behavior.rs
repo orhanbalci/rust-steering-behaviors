@@ -1,4 +1,3 @@
-use steerable::Steerable;
 use limiter::Limiter;
 use alga::general::Real;
 
