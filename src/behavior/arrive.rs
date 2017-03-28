@@ -1,4 +1,4 @@
-use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
+use super::super::{Limiter, SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
 use nalgebra::{distance, Point3};
 use alga::general::Real;
 use alga::general::AbstractModule;
@@ -14,9 +14,9 @@ pub struct Arrive<'a, T>
     pub behavior: SteeringBehavior<'a, T>,
     /// Target to go away from 
     pub target: &'a Steerable<T>,
-    pub tolerance : T,
-    pub deceleration_radius : T,
-    pub time_to_target : T,
+    pub tolerance: T,
+    pub deceleration_radius: T,
+    pub time_to_target: T,
 }
 
 
@@ -28,17 +28,24 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
 
         steering_acceleration.linear = *self.target.get_position() - *owner.get_position();
 
-        let  to_target = distance(&Point3::from_coordinates(steering_acceleration.linear),
-                                               &Point3::origin());
-        
+        let to_target = distance(&Point3::from_coordinates(steering_acceleration.linear),
+                                 &Point3::origin());
+
         if to_target <= self.tolerance {
             steering_acceleration.set_zero();
         }
-        // let mut target_speed = *self.behavior.limiter.get_max_linear_speed();
-        // if to_target <= self.deceleration_radius {
-        //     target_speed *= to_target/self.deceleration_radius;
-        // }
-
+        let mut target_speed = match self.behavior.limiter {
+            Some(lim) => lim.get_max_linear_speed(),
+            None => T::one(),
+        };
+        if to_target <= self.deceleration_radius {
+            target_speed *= (to_target / self.deceleration_radius);
+        }
+        steering_acceleration.linear = steering_acceleration.linear
+                                                            .multiply_by(target_speed / to_target);
+        steering_acceleration.linear -= *owner.get_linear_velocity();
+        steering_acceleration.linear  = steering_acceleration.linear.multiply_by(T::one()/self.time_to_target);
+        steering_acceleration.angular = T::zero();
         steering_acceleration
     }
 

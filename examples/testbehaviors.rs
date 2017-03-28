@@ -26,6 +26,7 @@ use steering::SteeringAcceleration;
 use steering::Seek;
 use steering::Flee;
 use steering::Pursue;
+use steering::Arrive;
 use steering::SteeringAccelerationCalculator;
 use steering::SteeringBehavior;
 
@@ -45,7 +46,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     fn new() -> App<'a> {
         App {
-            items: vec!["Seek", "Flee", "Pursue"],
+            items: vec!["Seek", "Flee", "Pursue", "Arrive"],
             selected: 0,
             events: vec![("Event1", "INFO"),
                          ("Event2", "INFO"),
@@ -205,10 +206,22 @@ fn main() {
         },
         target : &target,
     };
+    let arrive = Arrive{
+        behavior : SteeringBehavior {
+            enabled : true,
+            limiter : None,
+        },
+        target : &target,
+        time_to_target : 10f32,
+        deceleration_radius : 20f32,
+        tolerance : 5f32,
+    };
+
     let mut behaviors : Vec<&SteeringAccelerationCalculator<f32>> = vec![];
     behaviors.push(&seek);
     behaviors.push(&flee);
     behaviors.push(&pursue);
+    behaviors.push(&arrive);
 
     let mut app = App::new();
     app.behavior = Some(behaviors[0]); 

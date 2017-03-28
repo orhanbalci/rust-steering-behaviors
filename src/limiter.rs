@@ -4,7 +4,7 @@ use alga::general::Real;
 pub trait Limiter<T: Real> {
     fn get_zero_linear_speed_threshold(self: &Self) -> T;
     fn set_zero_linear_speed_threshold(self: &mut Self, threshold: T);
-    fn get_max_linear_sppeed(self: &Self) -> T;
+    fn get_max_linear_speed(self: &Self) -> T;
     fn set_max_linear_speed(self: &mut Self, linear_speed: T);
     fn get_max_linear_acceleration(self: &Self) -> T;
     fn set_max_linear_acceleration(self: &mut Self, linear_acceleration: T);
