@@ -33,46 +33,46 @@ impl<T: Real> SteeringAcceleration<T> {
     }
 
     /// Tests whether both linear and angular acceleration compenents are zero
-    pub fn is_zero(self: &Self) -> bool {
+    pub fn is_zero(&self) -> bool {
         self.angular.is_zero() && self.linear.is_zero()
     }
 
     /// Sets both compononents to zero
-    pub fn set_zero(self: &mut Self) -> &mut Self {
+    pub fn set_zero(&mut self) -> &mut Self {
         self.angular = T::zero();
         self.linear = Vector3::zero();
         self
     }
 
     /// 
-    pub fn add(self: &mut Self, other: SteeringAcceleration<T>) -> &mut Self {
+    pub fn add(&mut self, other: SteeringAcceleration<T>) -> &mut Self {
         self.angular = self.angular + other.angular;
         self.linear += other.linear;
         self
     }
 
     ///
-    pub fn scl(self: &mut Self, scale: T) -> &mut Self {
+    pub fn scl(&mut self, scale: T) -> &mut Self {
         self.angular = self.angular * scale;
         self.linear = self.linear.multiply_by(scale);
         self
     }
 
     ///
-    pub fn mul_add(self: &mut Self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
+    pub fn mul_add(&mut self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
         self.angular = self.angular + (other.angular * scale);
         self.linear += other.linear.multiply_by(scale);
         self
     }
 
     ///
-    pub fn calculate_square_magnitude(self: &Self) -> T {
+    pub fn calculate_square_magnitude(&self) -> T {
         distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin()) +
         self.angular * self.angular
     }
 
     ///
-    pub fn calculate_magnitude(self: &Self) -> T {
+    pub fn calculate_magnitude(&self) -> T {
         self.calculate_square_magnitude().sqrt()
     }
 }

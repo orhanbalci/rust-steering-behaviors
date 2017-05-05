@@ -44,7 +44,9 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
         steering_acceleration.linear = steering_acceleration.linear
                                                             .multiply_by(target_speed / to_target);
         steering_acceleration.linear -= *owner.get_linear_velocity();
-        steering_acceleration.linear  = steering_acceleration.linear.multiply_by(T::one()/self.time_to_target);
+        steering_acceleration.linear = steering_acceleration.linear
+                                                            .multiply_by(T::one() /
+                                                                         self.time_to_target);
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }
