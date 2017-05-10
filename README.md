@@ -25,3 +25,12 @@ This project aims to port libgdx-ai steering module to rust.
 - [ ] Reach Orientation
 - [ ] Raycast Obstacle Avoidance
 - [ ] Seperation
+
+### Missing limiters
+- [ ] Angular Acceleration Limiter
+- [ ] Angular Limiter
+- [ ] Angular Speed Limiter
+- [ ] Full Limiter
+- [ ] Linear Acceleration Limiter
+- [ ] Linear Limiter
+- [ ] Linear Speed Limiter
