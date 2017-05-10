@@ -44,7 +44,7 @@ impl<T: Real> SteeringAcceleration<T> {
         self
     }
 
-    /// 
+    ///
     pub fn add(&mut self, other: SteeringAcceleration<T>) -> &mut Self {
         self.angular = self.angular + other.angular;
         self.linear += other.linear;

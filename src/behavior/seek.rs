@@ -21,12 +21,11 @@ impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
                                    owner: &'b Steerable<T>)
                                    -> &'b mut SteeringAcceleration<T> {
         steering_acceleration.linear = (*self.target.get_position() - *owner.get_position())
-                                           .normalize()
-                                           .multiply_by(match self.behavior
-                                                                  .limiter {
-                                               Some(a) => (*a).get_max_linear_acceleration(),
-                                               None => T::one(),
-                                           });
+            .normalize()
+            .multiply_by(match self.behavior.limiter {
+                             Some(a) => (*a).get_max_linear_acceleration(),
+                             None => T::one(),
+                         });
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }

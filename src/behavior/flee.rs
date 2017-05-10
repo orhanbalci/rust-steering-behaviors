@@ -11,7 +11,7 @@ pub struct Flee<'a, T>
 {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
-    /// Target to go away from 
+    /// Target to go away from
     pub target: &'a Steerable<T>,
 }
 
@@ -23,12 +23,11 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Flee<'a, T> {
                                    -> &'b mut SteeringAcceleration<T> {
 
         steering_acceleration.linear = (*owner.get_position() - *self.target.get_position())
-                                           .normalize()
-                                           .multiply_by(match self.behavior
-                                                                  .limiter {
-                                               Some(l) => (*l).get_max_linear_acceleration(),
-                                               None => T::one(),
-                                           });
+            .normalize()
+            .multiply_by(match self.behavior.limiter {
+                             Some(l) => (*l).get_max_linear_acceleration(),
+                             None => T::one(),
+                         });
 
         steering_acceleration.angular = T::zero();
         steering_acceleration

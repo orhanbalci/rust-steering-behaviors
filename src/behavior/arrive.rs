@@ -12,7 +12,7 @@ pub struct Arrive<'a, T>
 {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
-    /// Target to go away from 
+    /// Target to go away from
     pub target: &'a Steerable<T>,
     pub tolerance: T,
     pub deceleration_radius: T,
@@ -27,7 +27,6 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
                                    -> &'b mut SteeringAcceleration<T> {
 
         steering_acceleration.linear = *self.target.get_position() - *owner.get_position();
-
         let to_target = distance(&Point3::from_coordinates(steering_acceleration.linear),
                                  &Point3::origin());
 
@@ -41,12 +40,13 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
         if to_target <= self.deceleration_radius {
             target_speed *= (to_target / self.deceleration_radius);
         }
-        steering_acceleration.linear = steering_acceleration.linear
-                                                            .multiply_by(target_speed / to_target);
+        steering_acceleration.linear = steering_acceleration
+            .linear
+            .multiply_by(target_speed / to_target);
         steering_acceleration.linear -= *owner.get_linear_velocity();
-        steering_acceleration.linear = steering_acceleration.linear
-                                                            .multiply_by(T::one() /
-                                                                         self.time_to_target);
+        steering_acceleration.linear = steering_acceleration
+            .linear
+            .multiply_by(T::one() / self.time_to_target);
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }

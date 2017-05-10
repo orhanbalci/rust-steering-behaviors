@@ -38,19 +38,18 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Pursue<'a, T> {
         }
 
         steering_acceleration.linear = self.target.get_position().clone();
-        steering_acceleration.mul_add(SteeringAcceleration::new(self.target
-                                                                    .get_linear_velocity()
-                                                                    .clone(),
-                                                                T::zero()),
-                                      prediction_time);
+        steering_acceleration
+            .mul_add(SteeringAcceleration::new(self.target.get_linear_velocity().clone(),
+                                               T::zero()),
+                     prediction_time);
         steering_acceleration.linear -= *owner.get_position();
         steering_acceleration.linear = steering_acceleration.linear.normalize();
-        steering_acceleration.linear =
-            steering_acceleration.linear.multiply_by(match self.behavior
-                                                               .limiter {
-                Some(a) => (*a).get_max_linear_acceleration(),
-                None => T::one(),
-            });
+        steering_acceleration.linear = steering_acceleration
+            .linear
+            .multiply_by(match self.behavior.limiter {
+                             Some(a) => (*a).get_max_linear_acceleration(),
+                             None => T::one(),
+                         });
         steering_acceleration.angular = T::zero();
         steering_acceleration
     }
