@@ -3,3 +3,25 @@
 ![License](https://img.shields.io/github/license/orhanbalci/rust-steering-behaviors.svg)
 # rust-steering-behaviors
 AI Steering behaviors crate implemented in Rust
+
+This project aims to port libgdx-ai steering module to rust.
+
+### Currently implemented behaviors
+- [x] Seek 
+- [x] Pursue
+- [x] Arrive
+- [x] Flee
+
+### Missing behaviors
+- [ ] Evade
+- [ ] Wander
+- [ ] Face
+- [ ] Follow Path
+- [ ] Follow Flow Field
+- [ ] Hide
+- [ ] Interpose
+- [ ] Jump
+- [ ] Match Velocity
+- [ ] Reach Orientation
+- [ ] Raycast Obstacle Avoidance
+- [ ] Seperation
