@@ -27,6 +27,7 @@ use steering::Seek;
 use steering::Flee;
 use steering::Pursue;
 use steering::Arrive;
+use steering::Evade;
 use steering::SteeringAccelerationCalculator;
 use steering::SteeringBehavior;
 
@@ -46,7 +47,7 @@ struct App<'a> {
 impl<'a> App<'a> {
     fn new() -> App<'a> {
         App {
-            items: vec!["Seek", "Flee", "Pursue", "Arrive"],
+            items: vec!["Seek", "Flee", "Pursue", "Arrive", "Evade"],
             selected: 0,
             events: vec![("Event1", "INFO"),
                          ("Event2", "INFO"),
@@ -97,6 +98,7 @@ impl<'a> App<'a> {
                           self.v.get_position().as_slice()[0],
                           self.v.get_position().as_slice()[1],
                           self.v.get_position().as_slice()[2]));
+        // self.target.advance_by_velocity();
     }
 }
 
@@ -147,6 +149,10 @@ impl Vehicle {
         self.angular_velocity += sa.angular;
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
+
+    fn advance_by_velocity(&mut self, milis: f32){
+        self.position += self.linear_velocity.multiply_by(milis / 1000.0);
+    }
 }
 
 fn main() {
@@ -191,6 +197,16 @@ fn main() {
         target: &target,
         max_prediction_time: 100.0f32,
     };
+
+    let evade = Evade {
+        behavior: SteeringBehavior {
+            enabled: true,
+            limiter: None,
+        },
+        target: &target,
+        max_prediction_time: 100.0f32,
+    };
+
     let seek = Seek {
         behavior: SteeringBehavior {
             enabled: true,
@@ -198,6 +214,7 @@ fn main() {
         },
         target: &target,
     };
+
     let flee = Flee {
         behavior: SteeringBehavior {
             enabled: true,
@@ -205,6 +222,7 @@ fn main() {
         },
         target: &target,
     };
+
     let arrive = Arrive {
         behavior: SteeringBehavior {
             enabled: true,
@@ -221,6 +239,7 @@ fn main() {
     behaviors.push(&flee);
     behaviors.push(&pursue);
     behaviors.push(&arrive);
+    behaviors.push(&evade);
 
     let mut app = App::new();
     app.behavior = Some(behaviors[0]);
@@ -254,7 +273,7 @@ fn main() {
                 }
             }
             Event::Tick => {
-                // target.advance(,100.0f32);
+                // target.advance_by_velocity(100.0f32);
                 app.advance();
             }
         }

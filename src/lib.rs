@@ -13,6 +13,7 @@ pub use behavior::Seek;
 pub use behavior::Flee;
 pub use behavior::Pursue;
 pub use behavior::Arrive;
+pub use behavior::Evade;
 
 mod steerable;
 mod steering_behavior;

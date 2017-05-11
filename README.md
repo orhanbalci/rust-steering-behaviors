@@ -11,9 +11,9 @@ This project aims to port libgdx-ai steering module to rust.
 - [x] Pursue
 - [x] Arrive
 - [x] Flee
+- [x] Evade
 
 ### Missing behaviors
-- [ ] Evade
 - [ ] Wander
 - [ ] Face
 - [ ] Follow Path

@@ -38,7 +38,7 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
             None => T::one(),
         };
         if to_target <= self.deceleration_radius {
-            target_speed *= (to_target / self.deceleration_radius);
+            target_speed *= to_target / self.deceleration_radius;
         }
         steering_acceleration.linear = steering_acceleration
             .linear
