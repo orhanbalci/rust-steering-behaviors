@@ -34,3 +34,57 @@ impl<'a, T: Real> SteeringAccelerationCalculator<T> for Seek<'a, T> {
         self.behavior.enabled
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::Seek;
+    use super::super::test_common::TestSteerable;
+    use super::super::super::Steerable;
+    use super::SteeringBehavior;
+    use super::SteeringAccelerationCalculator;
+    use super::SteeringAcceleration;
+    use nalgebra::Vector3;
+
+    #[test]
+    fn test_same_location() {
+        let mut test_target = TestSteerable::new();
+        let mut test_owner = TestSteerable::new();
+
+        let test_behavior = Seek {
+            behavior: SteeringBehavior {
+                enabled: true,
+                limiter: None,
+            },
+            target: &test_target,
+        };
+
+        let mut sa = SteeringAcceleration::default();
+
+        let acceleration_result = test_behavior.calculate_steering(&mut sa, &test_owner);
+        // assert_eq!(Vector3::new(0.0f32,0.0,0.0), acceleration_result.linear);
+        assert_eq!(0.0f32, acceleration_result.angular);
+    }
+
+    #[test]
+    fn test_one_dimension() {
+        let mut test_target = TestSteerable::new();
+        let mut test_owner = TestSteerable::new();
+
+        test_target.set_position(Vector3::new(1.0f32, 0.0, 0.0));
+        test_owner.set_position(Vector3::new(0.0f32, 0.0, 0.0));
+
+        let test_behavior = Seek {
+            behavior: SteeringBehavior {
+                enabled: true,
+                limiter: None,
+            },
+            target: &test_target,
+        };
+
+        let mut sa = SteeringAcceleration::default();
+
+        let acceleration_result = test_behavior.calculate_steering(&mut sa, &test_owner);
+        assert_eq!(Vector3::new(1.0f32, 0.0, 0.0), acceleration_result.linear);
+        assert_eq!(0.0f32, acceleration_result.angular);
+    }
+}

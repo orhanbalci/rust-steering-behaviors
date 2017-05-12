@@ -150,7 +150,7 @@ impl Vehicle {
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
 
-    fn advance_by_velocity(&mut self, milis: f32){
+    fn advance_by_velocity(&mut self, milis: f32) {
         self.position += self.linear_velocity.multiply_by(milis / 1000.0);
     }
 }

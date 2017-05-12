@@ -18,7 +18,7 @@ pub struct SteeringAcceleration<T: Real> {
 impl<T: Real> SteeringAcceleration<T> {
     pub fn default() -> SteeringAcceleration<T> {
         SteeringAcceleration {
-            linear: Vector3::new(T::zero(), T::zero(), T::zero()),
+            linear: Vector3::zero(),
             angular: T::zero(),
         }
     }
