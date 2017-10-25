@@ -1,4 +1,4 @@
-use nalgebra::{Vector3, Point3, distance_squared};
+use nalgebra::{distance_squared, Point3, Vector3};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use num_traits::identities::Zero;
@@ -23,9 +23,10 @@ impl<T: Real> SteeringAcceleration<T> {
         }
     }
     /// Creates a steering acceleration struct using given linear and angular components
-    pub fn new(linear_acceleration: Vector3<T>,
-               angular_acceleration: T)
-               -> SteeringAcceleration<T> {
+    pub fn new(
+        linear_acceleration: Vector3<T>,
+        angular_acceleration: T,
+    ) -> SteeringAcceleration<T> {
         SteeringAcceleration {
             linear: linear_acceleration,
             angular: angular_acceleration,
@@ -46,29 +47,29 @@ impl<T: Real> SteeringAcceleration<T> {
 
     ///
     pub fn add(&mut self, other: SteeringAcceleration<T>) -> &mut Self {
-        self.angular = self.angular + other.angular;
+        self.angular += other.angular;
         self.linear += other.linear;
         self
     }
 
     ///
     pub fn scl(&mut self, scale: T) -> &mut Self {
-        self.angular = self.angular * scale;
+        self.angular *= scale;
         self.linear = self.linear.multiply_by(scale);
         self
     }
 
     ///
     pub fn mul_add(&mut self, other: SteeringAcceleration<T>, scale: T) -> &mut Self {
-        self.angular = self.angular + (other.angular * scale);
+        self.angular += other.angular * scale;
         self.linear += other.linear.multiply_by(scale);
         self
     }
 
     ///
     pub fn calculate_square_magnitude(&self) -> T {
-        distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin()) +
-        self.angular * self.angular
+        distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin())
+            + self.angular * self.angular
     }
 
     ///
@@ -78,20 +79,22 @@ impl<T: Real> SteeringAcceleration<T> {
 }
 
 pub trait SteeringAccelerationCalculator<T: Real> {
-    fn calculate_steering<'a>(&self,
-                              steering_acceleration: &'a mut SteeringAcceleration<T>,
-                              owner: &'a Steerable<T>)
-                              -> &'a mut SteeringAcceleration<T> {
+    fn calculate_steering<'a>(
+        &self,
+        steering_acceleration: &'a mut SteeringAcceleration<T>,
+        owner: &'a Steerable<T>,
+    ) -> &'a mut SteeringAcceleration<T> {
         if self.is_enabled() {
             self.calculate_real_steering(steering_acceleration, owner)
         } else {
             steering_acceleration.set_zero()
         }
     }
-    fn calculate_real_steering<'a>(&self,
-                                   steering_acceleration: &'a mut SteeringAcceleration<T>,
-                                   owner: &'a Steerable<T>)
-                                   -> &'a mut SteeringAcceleration<T>;
+    fn calculate_real_steering<'a>(
+        &self,
+        steering_acceleration: &'a mut SteeringAcceleration<T>,
+        owner: &'a Steerable<T>,
+    ) -> &'a mut SteeringAcceleration<T>;
     fn is_enabled(self: &Self) -> bool;
     // fn set_enabled(&mut self, is_enabled : bool);
 }
@@ -118,16 +121,20 @@ mod test {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         let acceleration2 = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         acceleration.add(acceleration2);
-        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32),
-                   acceleration);
+        assert_eq!(
+            SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32),
+            acceleration
+        );
     }
 
     #[test]
     fn scl() {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0f32);
         acceleration.scl(2.0f32);
-        assert_eq!(SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0),
-                   acceleration);
+        assert_eq!(
+            SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0),
+            acceleration
+        );
     }
 
     #[test]
@@ -147,7 +154,9 @@ mod test {
         let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0);
         let acceleration2 = SteeringAcceleration::new(Vector3::new(1.0f32, 1.0, 1.0), 1.0);
         acceleration.mul_add(acceleration2, 2.0);
-        assert_eq!(SteeringAcceleration::new(Vector3::new(3.0f32, 3.0, 3.0), 3.0),
-                   acceleration);
+        assert_eq!(
+            SteeringAcceleration::new(Vector3::new(3.0f32, 3.0, 3.0), 3.0),
+            acceleration
+        );
     }
 }

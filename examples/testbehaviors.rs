@@ -1,8 +1,8 @@
-extern crate tui;
-extern crate termion;
+extern crate alga;
 extern crate nalgebra;
 extern crate steering;
-extern crate alga;
+extern crate termion;
+extern crate tui;
 
 use std::io;
 use std::thread;
@@ -14,10 +14,10 @@ use termion::input::TermRead;
 
 use tui::Terminal;
 use tui::backend::TermionBackend;
-use tui::widgets::{Widget, Block, border, SelectableList, List};
-use tui::widgets::canvas::{Canvas, Map, MapResolution, Line};
-use tui::layout::{Group, Direction, Size};
-use tui::style::{Style, Color, Modifier};
+use tui::widgets::{border, Block, List, SelectableList, Widget};
+use tui::widgets::canvas::{Canvas, Line, Map, MapResolution};
+use tui::layout::{Direction, Group, Size};
+use tui::style::{Color, Modifier, Style};
 
 use nalgebra::Vector3;
 use alga::general::AbstractModule;
@@ -49,32 +49,34 @@ impl<'a> App<'a> {
         App {
             items: vec!["Seek", "Flee", "Pursue", "Arrive", "Evade"],
             selected: 0,
-            events: vec![("Event1", "INFO"),
-                         ("Event2", "INFO"),
-                         ("Event3", "CRITICAL"),
-                         ("Event4", "ERROR"),
-                         ("Event5", "INFO"),
-                         ("Event6", "INFO"),
-                         ("Event7", "WARNING"),
-                         ("Event8", "INFO"),
-                         ("Event9", "INFO"),
-                         ("Event10", "INFO"),
-                         ("Event11", "CRITICAL"),
-                         ("Event12", "INFO"),
-                         ("Event13", "INFO"),
-                         ("Event14", "INFO"),
-                         ("Event15", "INFO"),
-                         ("Event16", "INFO"),
-                         ("Event17", "ERROR"),
-                         ("Event18", "ERROR"),
-                         ("Event19", "INFO"),
-                         ("Event20", "INFO"),
-                         ("Event21", "WARNING"),
-                         ("Event22", "INFO"),
-                         ("Event23", "INFO"),
-                         ("Event24", "WARNING"),
-                         ("Event25", "INFO"),
-                         ("Event26", "INFO")],
+            events: vec![
+                ("Event1", "INFO"),
+                ("Event2", "INFO"),
+                ("Event3", "CRITICAL"),
+                ("Event4", "ERROR"),
+                ("Event5", "INFO"),
+                ("Event6", "INFO"),
+                ("Event7", "WARNING"),
+                ("Event8", "INFO"),
+                ("Event9", "INFO"),
+                ("Event10", "INFO"),
+                ("Event11", "CRITICAL"),
+                ("Event12", "INFO"),
+                ("Event13", "INFO"),
+                ("Event14", "INFO"),
+                ("Event15", "INFO"),
+                ("Event16", "INFO"),
+                ("Event17", "ERROR"),
+                ("Event18", "ERROR"),
+                ("Event19", "INFO"),
+                ("Event20", "INFO"),
+                ("Event21", "WARNING"),
+                ("Event22", "INFO"),
+                ("Event23", "INFO"),
+                ("Event24", "WARNING"),
+                ("Event25", "INFO"),
+                ("Event26", "INFO"),
+            ],
             info_style: Style::default().fg(Color::White),
             warning_style: Style::default().fg(Color::Yellow),
             error_style: Style::default().fg(Color::Magenta),
@@ -90,14 +92,15 @@ impl<'a> App<'a> {
         self.events.insert(0, event);
         match self.behavior {
             Some(ref a) => self.v.advance(*a, 500f32),
-            None => (), 
+            None => (),
         };
         self.positions.clear();
-        self.positions
-            .push(format!("{}:{}:{}",
-                          self.v.get_position().as_slice()[0],
-                          self.v.get_position().as_slice()[1],
-                          self.v.get_position().as_slice()[2]));
+        self.positions.push(format!(
+            "{}:{}:{}",
+            self.v.get_position().as_slice()[0],
+            self.v.get_position().as_slice()[1],
+            self.v.get_position().as_slice()[2]
+        ));
         // self.target.advance_by_velocity();
     }
 }
@@ -177,9 +180,9 @@ fn main() {
 
     // Tick
     thread::spawn(move || loop {
-                      clock_tx.send(Event::Tick).unwrap();
-                      thread::sleep(time::Duration::from_millis(500));
-                  });
+        clock_tx.send(Event::Tick).unwrap();
+        thread::sleep(time::Duration::from_millis(500));
+    });
 
     // App
     let mut target = Vehicle {
@@ -251,27 +254,23 @@ fn main() {
     loop {
         let evt = rx.recv().unwrap();
         match evt {
-            Event::Input(input) => {
-                match input {
-                    event::Key::Char('q') => {
-                        break;
-                    }
-                    event::Key::Down => {
-                        app.selected += 1;
-                        if app.selected > app.items.len() - 1 {
-                            app.selected = 0;
-                        }
-                    }
-                    event::Key::Up => {
-                        if app.selected > 0 {
-                            app.selected -= 1;
-                        } else {
-                            app.selected = app.items.len() - 1;
-                        }
-                    }
-                    _ => {}
+            Event::Input(input) => match input {
+                event::Key::Char('q') => {
+                    break;
                 }
-            }
+                event::Key::Down => {
+                    app.selected += 1;
+                    if app.selected > app.items.len() - 1 {
+                        app.selected = 0;
+                    }
+                }
+                event::Key::Up => if app.selected > 0 {
+                    app.selected -= 1;
+                } else {
+                    app.selected = app.items.len() - 1;
+                },
+                _ => {}
+            },
             Event::Tick => {
                 // target.advance_by_velocity(100.0f32);
                 app.advance();
@@ -285,7 +284,6 @@ fn main() {
 }
 
 fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
-
     let size = t.size().unwrap();
 
     Group::default()
@@ -297,81 +295,84 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
                 .sizes(&[Size::Percent(15), Size::Percent(85)])
                 .render(t, &chunks[0], |t, chunks| {
                     SelectableList::default()
-                        .block(Block::default()
-                                   .borders(border::ALL)
-                                   .title("Steering Behaviors"))
+                        .block(
+                            Block::default()
+                                .borders(border::ALL)
+                                .title("Steering Behaviors"),
+                        )
                         .items(&app.items)
                         .select(app.selected)
-                        .highlight_style(Style::default()
-                                             .fg(Color::Yellow)
-                                             .modifier(Modifier::Bold))
+                        .highlight_style(
+                            Style::default().fg(Color::Yellow).modifier(Modifier::Bold),
+                        )
                         .highlight_symbol(">")
                         .render(t, &chunks[0]);
 
                     Canvas::default()
-                        .block(Block::default()
-                                   .borders(border::ALL)
-                                   .title("Steering Actors"))
+                        .block(
+                            Block::default()
+                                .borders(border::ALL)
+                                .title("Steering Actors"),
+                        )
                         .paint(|ctx| {
                             /// draw steerable vehicle
                             ctx.draw(&Line {
-                                         x1: (app.v.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         x2: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Red,
-                                     });
+                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Red,
+                            });
                             ctx.draw(&Line {
-                                         x1: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y1: (app.v.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Red,
-                                     });
+                                x1: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
+                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Red,
+                            });
                             ctx.draw(&Line {
-                                         x1: (app.v.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (app.v.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (app.v.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (app.v.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         color: Color::Red,
-                                     });
+                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
+                                color: Color::Red,
+                            });
                             ctx.draw(&Line {
-                                         x1: (app.v.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (app.v.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (app.v.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y2: (app.v.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Red,
-                                     });
+                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
+                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Red,
+                            });
                             /// draw target
                             ctx.draw(&Line {
-                                         x1: (target.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (target.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         x2: (target.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (target.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Green,
-                                     });
+                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Green,
+                            });
                             ctx.draw(&Line {
-                                         x1: (target.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y1: (target.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (target.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (target.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Green,
-                                     });
+                                x1: f64::from(target.get_position().as_slice()[0] + 10.0f32),
+                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Green,
+                            });
                             ctx.draw(&Line {
-                                         x1: (target.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (target.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (target.get_position().as_slice()[0] + 10.0f32) as f64,
-                                         y2: (target.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         color: Color::Green,
-                                     });
+                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
+                                y2: f64::from(target.get_position().as_slice()[1] - 10.0f32),
+                                color: Color::Green,
+                            });
                             ctx.draw(&Line {
-                                         x1: (target.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y1: (target.get_position().as_slice()[1] - 10.0f32) as f64,
-                                         x2: (target.get_position().as_slice()[0] - 10.0f32) as f64,
-                                         y2: (target.get_position().as_slice()[1] + 10.0f32) as f64,
-                                         color: Color::Green,
-                                     });
-
+                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
+                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
+                                x2: f64::from(target.get_position().as_slice()[0] - 10.0f32),
+                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                color: Color::Green,
+                            });
                         })
                         .x_bounds([-180.0, 180.0])
                         .y_bounds([-180.0, 180.0])
@@ -379,17 +380,21 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
                 });
 
             List::default()
-                .block(Block::default()
-                           .borders(border::ALL)
-                           .title("Instructions")
-                           .title_style(Style::default()
-                                            .fg(Color::White)
-                                            .bg(Color::Red)
-                                            .modifier(Modifier::Bold)))
+                .block(
+                    Block::default()
+                        .borders(border::ALL)
+                        .title("Instructions")
+                        .title_style(
+                            Style::default()
+                                .fg(Color::White)
+                                .bg(Color::Red)
+                                .modifier(Modifier::Bold),
+                        ),
+                )
                 .items(&app.positions
-                            .iter()
-                            .map(|evt| (format!("{}", evt), &app.error_style))
-                            .collect::<Vec<(String, &Style)>>())
+                    .iter()
+                    .map(|evt| (evt.to_owned(), &app.error_style))
+                    .collect::<Vec<(String, &Style)>>())
                 .render(t, &chunks[1]);
         });
 

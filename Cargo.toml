@@ -5,7 +5,7 @@ version = "0.1.0"
 
 [dependencies]
 alga = "*"
-derive_builder = "0.3.0"
+derive_builder = "0.5.0"
 nalgebra = "*"
 num-traits = "*"
 

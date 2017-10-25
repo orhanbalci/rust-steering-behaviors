@@ -4,24 +4,44 @@ use alga::general::Real;
 use alga::general::AbstractModule;
 use Steerable;
 
-/// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
-/// to go away from target
 #[derive(Builder)]
-pub struct Arrive<'a, T>
+pub struct Face<'a, T>
 where
     T: 'a + Real,
 {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
-    /// Target to go away from
     pub target: &'a Steerable<T>,
-    pub tolerance: T,
+    pub allign_tolerance: T,
     pub deceleration_radius: T,
     pub time_to_target: T,
 }
 
+fn wrap_angle_around_zero<T: Real>(inp: T) -> T {
+    if inp >= T::zero() {
+        let mut rotation = inp % T::two_pi();
+        if rotation > T::pi() {
+            rotation -= T::two_pi();
+        }
+        rotation
+    } else {
+        let mut rotation = -inp % T::two_pi();
+        if rotation > T::pi() {
+            rotation -= T::two_pi();
+        }
+        -rotation
+    }
+}
 
-impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
+// impl<'a, T: 'a + Real> Face<'a, T>{
+//     fn reach_orientation<'b>(&self,
+//     sttering_acceleration: &'b mut SteeringAcceleration<T>,
+//     owner : &'b Steerable<T>) -> &'b mut SteeringAcceleration<T>{
+
+//     }
+// }
+
+impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Face<'a, T> {
     fn calculate_real_steering<'b>(
         &self,
         steering_acceleration: &'b mut SteeringAcceleration<T>,
@@ -33,7 +53,7 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Arrive<'a, T> {
             &Point3::origin(),
         );
 
-        if to_target <= self.tolerance {
+        if to_target <= self.allign_tolerance {
             steering_acceleration.set_zero();
         }
         let mut target_speed = match self.behavior.limiter {

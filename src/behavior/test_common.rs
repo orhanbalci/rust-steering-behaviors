@@ -1,6 +1,6 @@
 #[cfg(test)]
-use super::super::{Steerable, SteeringBehavior, SteeringAcceleration,
-                   SteeringAccelerationCalculator};
+use super::super::{Steerable, SteeringAcceleration, SteeringAccelerationCalculator,
+                   SteeringBehavior};
 use nalgebra::Vector3;
 use alga::general::AbstractModule;
 

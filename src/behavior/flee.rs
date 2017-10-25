@@ -1,4 +1,4 @@
-use super::super::{SteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator};
+use super::super::{SteeringAcceleration, SteeringAccelerationCalculator, SteeringBehavior};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use Steerable;
@@ -7,7 +7,8 @@ use Steerable;
 /// to go away from target
 #[derive(Builder)]
 pub struct Flee<'a, T>
-    where T: 'a + Real
+where
+    T: 'a + Real,
 {
     /// Common behavior attributes
     pub behavior: SteeringBehavior<'a, T>,
@@ -17,17 +18,17 @@ pub struct Flee<'a, T>
 
 
 impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Flee<'a, T> {
-    fn calculate_real_steering<'b>(&self,
-                                   steering_acceleration: &'b mut SteeringAcceleration<T>,
-                                   owner: &'b Steerable<T>)
-                                   -> &'b mut SteeringAcceleration<T> {
-
+    fn calculate_real_steering<'b>(
+        &self,
+        steering_acceleration: &'b mut SteeringAcceleration<T>,
+        owner: &'b Steerable<T>,
+    ) -> &'b mut SteeringAcceleration<T> {
         steering_acceleration.linear = (*owner.get_position() - *self.target.get_position())
             .normalize()
             .multiply_by(match self.behavior.limiter {
-                             Some(l) => (*l).get_max_linear_acceleration(),
-                             None => T::one(),
-                         });
+                Some(l) => (*l).get_max_linear_acceleration(),
+                None => T::one(),
+            });
 
         steering_acceleration.angular = T::zero();
         steering_acceleration

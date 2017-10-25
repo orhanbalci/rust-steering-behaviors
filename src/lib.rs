@@ -1,8 +1,8 @@
-extern crate nalgebra;
 extern crate alga;
-extern crate num_traits;
 #[macro_use]
 extern crate derive_builder;
+extern crate nalgebra;
+extern crate num_traits;
 
 pub use self::steerable::Steerable;
 pub use self::steering_behavior::SteeringBehavior;
