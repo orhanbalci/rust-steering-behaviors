@@ -1,7 +1,9 @@
 use super::super::{Limiter, SteeringAcceleration, SteeringAccelerationCalculator, SteeringBehavior};
-use nalgebra::{distance, Point3};
+use nalgebra::{distance, Point3, Vector3};
 use alga::general::Real;
 use alga::general::AbstractModule;
+use std::f32::MAX;
+use num_traits::identities::Zero;
 use Steerable;
 
 #[derive(Builder)]
@@ -33,13 +35,41 @@ fn wrap_angle_around_zero<T: Real>(inp: T) -> T {
     }
 }
 
-// impl<'a, T: 'a + Real> Face<'a, T>{
-//     fn reach_orientation<'b>(&self,
-//     sttering_acceleration: &'b mut SteeringAcceleration<T>,
-//     owner : &'b Steerable<T>) -> &'b mut SteeringAcceleration<T>{
+impl<'a, T: 'a + Real> Face<'a, T> {
+    fn reach_orientation<'b>(
+        &self,
+        steering_acceleration: &'b mut SteeringAcceleration<T>,
+        owner: &'b Steerable<T>,
+        target_orientation: T,
+    ) -> &'b mut SteeringAcceleration<T> {
+        let rotation = wrap_angle_around_zero(target_orientation - owner.get_orientation());
+        let abs_rotation = Real::abs(rotation);
+        if abs_rotation <= self.allign_tolerance {
+            steering_acceleration.set_zero();
+        }
 
-//     }
-// }
+        let mut target_rotation = match self.behavior.limiter {
+            Some(lim) => lim.get_max_angular_speed(),
+            None => T::from_f32(MAX).unwrap(),
+        };
+        if abs_rotation < self.deceleration_radius {
+            target_rotation *= abs_rotation / self.deceleration_radius;
+        }
+
+        target_rotation *= rotation / abs_rotation;
+
+        steering_acceleration.angular =
+            (target_rotation - owner.get_angular_velocity()) / self.time_to_target;
+        let angular_acceleration = Real::abs(steering_acceleration.angular);
+        if let Some(lim) = self.behavior.limiter {
+            if angular_acceleration > lim.get_max_angular_speed() {
+                steering_acceleration.angular *= lim.get_max_angular_speed() / angular_acceleration;
+            }
+        }
+        steering_acceleration.linear = Vector3::zero();
+        steering_acceleration
+    }
+}
 
 impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Face<'a, T> {
     fn calculate_real_steering<'b>(
@@ -58,7 +88,7 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Face<'a, T> {
         }
         let mut target_speed = match self.behavior.limiter {
             Some(lim) => lim.get_max_linear_speed(),
-            None => T::one(),
+            None => T::from_f32(MAX).unwrap(),
         };
         if to_target <= self.deceleration_radius {
             target_speed *= to_target / self.deceleration_radius;

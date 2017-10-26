@@ -133,6 +133,10 @@ impl Steerable<f32> for Vehicle {
     fn get_position(&self) -> &Vector3<f32> {
         &self.position
     }
+
+    fn get_orientation(&self) -> f32 {
+        0.0f32
+    }
 }
 
 impl Vehicle {

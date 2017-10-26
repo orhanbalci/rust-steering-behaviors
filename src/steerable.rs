@@ -13,4 +13,6 @@ pub trait Steerable<T: Real> {
     fn get_bounding_radius(self: &Self) -> T;
 
     fn get_position(self: &Self) -> &Vector3<T>;
+
+    fn get_orientation(&self) -> T;
 }
