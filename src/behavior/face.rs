@@ -1,7 +1,6 @@
 use super::super::{Limiter, SteeringAcceleration, SteeringAccelerationCalculator, SteeringBehavior};
 use nalgebra::{angle, distance, Point3, Vector3};
 use alga::general::Real;
-use alga::general::AbstractModule;
 use std::f32::MAX;
 use num_traits::identities::Zero;
 use Steerable;
