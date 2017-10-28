@@ -1,5 +1,5 @@
 use super::super::{Limiter, SteeringAcceleration, SteeringAccelerationCalculator, SteeringBehavior};
-use nalgebra::{distance, Point3, Vector3};
+use nalgebra::{angle, distance, Point3, Vector3};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use std::f32::MAX;
@@ -83,25 +83,17 @@ impl<'a, T: 'a + Real> SteeringAccelerationCalculator<T> for Face<'a, T> {
             &Point3::origin(),
         );
 
-        if to_target <= self.allign_tolerance {
-            steering_acceleration.set_zero();
+        if let Some(lim) = self.behavior.limiter {
+            if to_target.powi(2) < lim.get_zero_linear_speed_threshold() {
+                steering_acceleration.set_zero();
+            }
         }
-        let mut target_speed = match self.behavior.limiter {
-            Some(lim) => lim.get_max_linear_speed(),
-            None => T::from_f32(MAX).unwrap(),
-        };
-        if to_target <= self.deceleration_radius {
-            target_speed *= to_target / self.deceleration_radius;
-        }
-        steering_acceleration.linear = steering_acceleration
-            .linear
-            .multiply_by(target_speed / to_target);
-        steering_acceleration.linear -= *owner.get_linear_velocity();
-        steering_acceleration.linear = steering_acceleration
-            .linear
-            .multiply_by(T::one() / self.time_to_target);
-        steering_acceleration.angular = T::zero();
-        steering_acceleration
+
+        let target_orientation = angle(
+            &steering_acceleration.linear,
+            &Vector3::new(T::zero(), T::one(), T::zero()),
+        );
+        self.reach_orientation(steering_acceleration, owner, target_orientation)
     }
 
     fn is_enabled(self: &Self) -> bool {
