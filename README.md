@@ -3,7 +3,8 @@
 ![License](https://img.shields.io/github/license/orhanbalci/rust-steering-behaviors.svg)
 # rust-steering-behaviors
 AI Steering behaviors crate implemented in Rust
-https://user-images.githubusercontent.com/583842/32414732-c7b6b6e2-c22d-11e7-94f4-a78fa2d3d9ed.gif
+
+(https://user-images.githubusercontent.com/583842/32414732-c7b6b6e2-c22d-11e7-94f4-a78fa2d3d9ed.gif)
 
 This project aims to port libgdx-ai steering module to rust.
 
