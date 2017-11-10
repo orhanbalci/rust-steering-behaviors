@@ -3,6 +3,10 @@ use alga::general::Real;
 use alga::general::AbstractModule;
 use num_traits::identities::Zero;
 use Steerable;
+use IsEnabled;
+
+use std::cell::RefCell;
+use std::rc::Rc;
 
 /// Represents result of a steering behaviour computation. User can aggregate
 /// more than one behaviour result into single acceleration struct.
@@ -78,24 +82,24 @@ impl<T: Real> SteeringAcceleration<T> {
     }
 }
 
-pub trait SteeringAccelerationCalculator<T: Real> {
-    fn calculate_steering<'a>(
-        &self,
-        steering_acceleration: &'a mut SteeringAcceleration<T>,
-        owner: &'a Steerable<T>,
-    ) -> &'a mut SteeringAcceleration<T> {
-        if self.is_enabled() {
-            self.calculate_real_steering(steering_acceleration, owner)
+pub trait SteeringAccelerationCalculator<T: Real>: IsEnabled<T> {
+    fn calculate_steering(
+        &mut self,
+        steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
+    ) -> Rc<RefCell<SteeringAcceleration<T>>> {
+        if self.isEnabled() {
+            self.calculate_real_steering(steering_acceleration.clone());
+            steering_acceleration
         } else {
-            steering_acceleration.set_zero()
+            steering_acceleration.borrow_mut().set_zero();
+            steering_acceleration
         }
     }
-    fn calculate_real_steering<'a>(
+
+    fn calculate_real_steering(
         &self,
-        steering_acceleration: &'a mut SteeringAcceleration<T>,
-        owner: &'a Steerable<T>,
-    ) -> &'a mut SteeringAcceleration<T>;
-    fn is_enabled(self: &Self) -> bool;
+        steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
+    ) -> Rc<RefCell<SteeringAcceleration<T>>>;
     // fn set_enabled(&mut self, is_enabled : bool);
 }
 

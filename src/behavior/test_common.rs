@@ -3,6 +3,8 @@ use super::super::{Steerable, SteeringAcceleration, SteeringAccelerationCalculat
                    SteeringBehavior};
 use nalgebra::Vector3;
 use alga::general::AbstractModule;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct TestSteerable {
     linear_velocity: Vector3<f32>,
@@ -43,11 +45,11 @@ impl TestSteerable {
         }
     }
 
-    pub fn advance(&mut self, calc: &SteeringAccelerationCalculator<f32>, milis: f32) {
-        let mut sa = SteeringAcceleration::default();
-        calc.calculate_steering(&mut sa, self);
-        self.linear_velocity += sa.linear;
-        self.angular_velocity += sa.angular;
+    pub fn advance(&mut self, calc: &mut SteeringAccelerationCalculator<f32>, milis: f32) {
+        let mut sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
+        sa = calc.calculate_steering(sa);
+        self.linear_velocity += sa.borrow().linear;
+        self.angular_velocity += sa.borrow().angular;
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
 

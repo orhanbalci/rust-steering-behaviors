@@ -8,6 +8,9 @@ use std::io;
 use std::thread;
 use std::time;
 use std::sync::mpsc;
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::cell::RefMut;
 
 use termion::event;
 use termion::input::TermRead;
@@ -39,8 +42,8 @@ struct App<'a> {
     warning_style: Style,
     error_style: Style,
     critical_style: Style,
-    v: Vehicle,
-    behavior: Option<&'a SteeringAccelerationCalculator<f32>>,
+    v: Rc<RefCell<Vehicle>>,
+    behavior: Option<Rc<RefCell<SteeringAccelerationCalculator<f32>>>>,
     positions: Vec<String>,
 }
 
@@ -81,7 +84,7 @@ impl<'a> App<'a> {
             warning_style: Style::default().fg(Color::Yellow),
             error_style: Style::default().fg(Color::Magenta),
             critical_style: Style::default().fg(Color::Red),
-            v: Vehicle::new(),
+            v: Rc::new(RefCell::new(Vehicle::new())),
             behavior: None,
             positions: vec![],
         }
@@ -91,15 +94,18 @@ impl<'a> App<'a> {
         let event = self.events.pop().unwrap();
         self.events.insert(0, event);
         match self.behavior {
-            Some(ref a) => self.v.advance(*a, 500f32),
+            Some(ref mut a) => {
+                let sa = self.v.borrow().calculate_steering(a.borrow_mut());
+                self.v.borrow_mut().advance(sa, 500f32)
+            }
             None => (),
         };
         self.positions.clear();
         self.positions.push(format!(
             "{}:{}:{}",
-            self.v.get_position().as_slice()[0],
-            self.v.get_position().as_slice()[1],
-            self.v.get_position().as_slice()[2]
+            self.v.borrow().get_position().as_slice()[0],
+            self.v.borrow().get_position().as_slice()[1],
+            self.v.borrow().get_position().as_slice()[2]
         ));
         // self.target.advance_by_velocity();
     }
@@ -149,12 +155,19 @@ impl Vehicle {
         }
     }
 
-    fn advance(&mut self, calc: &SteeringAccelerationCalculator<f32>, milis: f32) {
-        let mut sa = SteeringAcceleration::default();
-        calc.calculate_steering(&mut sa, self);
-        self.linear_velocity += sa.linear;
-        self.angular_velocity += sa.angular;
+    fn advance(&mut self, sa: Rc<RefCell<SteeringAcceleration<f32>>>, milis: f32) {
+        self.linear_velocity += sa.borrow().linear;
+        self.angular_velocity += sa.borrow().angular;
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
+    }
+
+    fn calculate_steering(
+        &self,
+        mut calc: RefMut<SteeringAccelerationCalculator<f32>>,
+    ) -> Rc<RefCell<SteeringAcceleration<f32>>> {
+        let mut sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
+        sa = calc.calculate_steering(sa);
+        sa
     }
 
     fn advance_by_velocity(&mut self, milis: f32) {
@@ -170,6 +183,7 @@ fn main() {
     let input_tx = tx.clone();
     let clock_tx = tx.clone();
 
+    let mut app = App::new();
     // Input
     thread::spawn(move || {
         let stdin = io::stdin();
@@ -189,71 +203,75 @@ fn main() {
     });
 
     // App
-    let mut target = Vehicle {
+    let target = Rc::new(RefCell::new(Vehicle {
         linear_velocity: Vector3::new(1.0, 0.0, 0.0),
         position: Vector3::new(0.0, 0.0, 0.0),
         angular_velocity: 0.0,
         bounding_radius: 2.0,
-    };
+    }));
 
     let pursue = Pursue {
-        behavior: SteeringBehavior {
+        behavior: RefCell::new(SteeringBehavior {
             enabled: true,
             limiter: None,
-        },
-        target: &target,
+            target: target.clone(),
+            owner: app.v.clone(),
+        }),
         max_prediction_time: 100.0f32,
     };
 
     let evade = Evade {
-        behavior: SteeringBehavior {
+        behavior: RefCell::new(SteeringBehavior {
             enabled: true,
             limiter: None,
-        },
-        target: &target,
+            target: target.clone(),
+            owner: app.v.clone(),
+        }),
         max_prediction_time: 100.0f32,
     };
 
     let seek = Seek {
-        behavior: SteeringBehavior {
+        behavior: RefCell::new(SteeringBehavior {
             enabled: true,
             limiter: None,
-        },
-        target: &target,
+            target: target.clone(),
+            owner: app.v.clone(),
+        }),
     };
 
     let flee = Flee {
-        behavior: SteeringBehavior {
+        behavior: RefCell::new(SteeringBehavior {
             enabled: true,
             limiter: None,
-        },
-        target: &target,
+            target: target.clone(),
+            owner: app.v.clone(),
+        }),
     };
 
     let arrive = Arrive {
-        behavior: SteeringBehavior {
+        behavior: RefCell::new(SteeringBehavior {
             enabled: true,
             limiter: None,
-        },
-        target: &target,
+            target: target.clone(),
+            owner: app.v.clone(),
+        }),
         time_to_target: 10f32,
         deceleration_radius: 20f32,
         tolerance: 5f32,
     };
 
-    let mut behaviors: Vec<&SteeringAccelerationCalculator<f32>> = vec![];
-    behaviors.push(&seek);
-    behaviors.push(&flee);
-    behaviors.push(&pursue);
-    behaviors.push(&arrive);
-    behaviors.push(&evade);
+    let mut behaviors: Vec<Rc<RefCell<SteeringAccelerationCalculator<f32>>>> = vec![];
+    behaviors.push(Rc::new(RefCell::new(seek)));
+    behaviors.push(Rc::new(RefCell::new(flee)));
+    behaviors.push(Rc::new(RefCell::new(pursue)));
+    behaviors.push(Rc::new(RefCell::new(arrive)));
+    behaviors.push(Rc::new(RefCell::new(evade)));
 
-    let mut app = App::new();
-    app.behavior = Some(behaviors[0]);
+    app.behavior = Some(behaviors[0].clone());
     // First draw call
     terminal.clear().unwrap();
     terminal.hide_cursor().unwrap();
-    draw(&mut terminal, &app, &target);
+    draw(&mut terminal, &app, target.clone());
 
     loop {
         let evt = rx.recv().unwrap();
@@ -276,18 +294,18 @@ fn main() {
                 _ => {}
             },
             Event::Tick => {
-                // target.advance_by_velocity(100.0f32);
+                target.borrow_mut().advance_by_velocity(300.0f32);
                 app.advance();
             }
         }
-        app.behavior = Some(behaviors[app.selected]);
-        draw(&mut terminal, &app, &target);
+        app.behavior = Some(behaviors[app.selected].clone());
+        draw(&mut terminal, &app, target.clone());
     }
 
     terminal.show_cursor().unwrap();
 }
 
-fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
+fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>>) {
     let size = t.size().unwrap();
 
     Group::default()
@@ -321,60 +339,124 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: &Vehicle) {
                         .paint(|ctx| {
                             /// draw steerable vehicle
                             ctx.draw(&Line {
-                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
-                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Red,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
-                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Red,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(app.v.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
+                                x1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
                                 color: Color::Red,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(app.v.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(app.v.get_position().as_slice()[0] - 10.0f32),
-                                y2: f64::from(app.v.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    app.v.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Red,
                             });
                             /// draw target
                             ctx.draw(&Line {
-                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(target.get_position().as_slice()[1] + 10.0f32),
-                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    target.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    target.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    target.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    target.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Green,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(target.get_position().as_slice()[0] + 10.0f32),
-                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    target.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    target.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    target.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    target.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Green,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(target.get_position().as_slice()[0] + 10.0f32),
-                                y2: f64::from(target.get_position().as_slice()[1] - 10.0f32),
+                                x1: f64::from(
+                                    target.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    target.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    target.borrow().get_position().as_slice()[0] + 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    target.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
                                 color: Color::Green,
                             });
                             ctx.draw(&Line {
-                                x1: f64::from(target.get_position().as_slice()[0] - 10.0f32),
-                                y1: f64::from(target.get_position().as_slice()[1] - 10.0f32),
-                                x2: f64::from(target.get_position().as_slice()[0] - 10.0f32),
-                                y2: f64::from(target.get_position().as_slice()[1] + 10.0f32),
+                                x1: f64::from(
+                                    target.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y1: f64::from(
+                                    target.borrow().get_position().as_slice()[1] - 10.0f32,
+                                ),
+                                x2: f64::from(
+                                    target.borrow().get_position().as_slice()[0] - 10.0f32,
+                                ),
+                                y2: f64::from(
+                                    target.borrow().get_position().as_slice()[1] + 10.0f32,
+                                ),
                                 color: Color::Green,
                             });
                         })

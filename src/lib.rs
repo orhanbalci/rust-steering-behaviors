@@ -6,6 +6,8 @@ extern crate num_traits;
 
 pub use self::steerable::Steerable;
 pub use self::steering_behavior::SteeringBehavior;
+pub use self::steering_behavior::HasSteeringBehavior;
+pub use self::steering_behavior::IsEnabled;
 pub use self::limiter::Limiter;
 pub use self::steering_acceleration::SteeringAcceleration;
 pub use self::steering_acceleration::SteeringAccelerationCalculator;
