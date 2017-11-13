@@ -276,23 +276,27 @@ fn main() {
     loop {
         let evt = rx.recv().unwrap();
         match evt {
-            Event::Input(input) => match input {
-                event::Key::Char('q') => {
-                    break;
-                }
-                event::Key::Down => {
-                    app.selected += 1;
-                    if app.selected > app.items.len() - 1 {
-                        app.selected = 0;
+            Event::Input(input) => {
+                match input {
+                    event::Key::Char('q') => {
+                        break;
                     }
+                    event::Key::Down => {
+                        app.selected += 1;
+                        if app.selected > app.items.len() - 1 {
+                            app.selected = 0;
+                        }
+                    }
+                    event::Key::Up => {
+                        if app.selected > 0 {
+                            app.selected -= 1;
+                        } else {
+                            app.selected = app.items.len() - 1;
+                        }
+                    }
+                    _ => {}
                 }
-                event::Key::Up => if app.selected > 0 {
-                    app.selected -= 1;
-                } else {
-                    app.selected = app.items.len() - 1;
-                },
-                _ => {}
-            },
+            }
             Event::Tick => {
                 target.borrow_mut().advance_by_velocity(300.0f32);
                 app.advance();
@@ -317,11 +321,9 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>
                 .sizes(&[Size::Percent(15), Size::Percent(85)])
                 .render(t, &chunks[0], |t, chunks| {
                     SelectableList::default()
-                        .block(
-                            Block::default()
-                                .borders(border::ALL)
-                                .title("Steering Behaviors"),
-                        )
+                        .block(Block::default().borders(border::ALL).title(
+                            "Steering Behaviors",
+                        ))
                         .items(&app.items)
                         .select(app.selected)
                         .highlight_style(
@@ -331,11 +333,9 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>
                         .render(t, &chunks[0]);
 
                     Canvas::default()
-                        .block(
-                            Block::default()
-                                .borders(border::ALL)
-                                .title("Steering Actors"),
-                        )
+                        .block(Block::default().borders(border::ALL).title(
+                            "Steering Actors",
+                        ))
                         .paint(|ctx| {
                             /// draw steerable vehicle
                             ctx.draw(&Line {
@@ -470,12 +470,9 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>
                     Block::default()
                         .borders(border::ALL)
                         .title("Instructions")
-                        .title_style(
-                            Style::default()
-                                .fg(Color::White)
-                                .bg(Color::Red)
-                                .modifier(Modifier::Bold),
-                        ),
+                        .title_style(Style::default().fg(Color::White).bg(Color::Red).modifier(
+                            Modifier::Bold,
+                        )),
                 )
                 .items(&app.positions
                     .iter()

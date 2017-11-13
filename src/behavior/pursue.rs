@@ -1,12 +1,13 @@
 use nalgebra::{distance_squared, Point3};
-use super::super::{HasSteeringBehavior, Steerable, SteeringAcceleration,
-                   SteeringAccelerationCalculator, SteeringBehavior};
+use super::super::{HasSteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator,
+                   SteeringBehavior};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+#[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Pursue<T>
 where
@@ -33,14 +34,16 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Pursue<T> {
         let behavior = self.behavior.borrow();
         let square_distance = distance_squared(
             &Point3::from_coordinates(
-                *behavior.target.borrow().get_position() - *behavior.owner.borrow().get_position(),
+                *behavior.target.borrow().get_position() -
+                    *behavior.owner.borrow().get_position(),
             ),
             &Point3::origin(),
         );
-        let square_speed = distance_squared(
-            &Point3::from_coordinates(*behavior.owner.borrow().get_linear_velocity()),
-            &Point3::origin(),
-        );
+        let square_speed =
+            distance_squared(
+                &Point3::from_coordinates(*behavior.owner.borrow().get_linear_velocity()),
+                &Point3::origin(),
+            );
         let mut prediction_time = self.max_prediction_time;
         if square_speed > T::zero() {
             let square_prediction_time = square_distance / square_speed;
@@ -51,7 +54,10 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Pursue<T> {
 
         steering_acceleration.borrow_mut().linear = *behavior.target.borrow().get_position();
         steering_acceleration.borrow_mut().mul_add(
-            SteeringAcceleration::new(*behavior.target.borrow().get_linear_velocity(), T::zero()),
+            SteeringAcceleration::new(
+                *behavior.target.borrow().get_linear_velocity(),
+                T::zero(),
+            ),
             prediction_time,
         );
         let mut sa = steering_acceleration.borrow_mut();

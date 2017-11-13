@@ -1,15 +1,15 @@
-use super::super::{HasSteeringBehavior, Limiter, SteeringAcceleration,
-                   SteeringAccelerationCalculator, SteeringBehavior};
+use super::super::{HasSteeringBehavior, SteeringAcceleration, SteeringAccelerationCalculator,
+                   SteeringBehavior};
 use nalgebra::{distance, Point3};
 use alga::general::Real;
 use alga::general::AbstractModule;
-use Steerable;
 use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 /// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
 /// to go away from target
+#[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Arrive<T>
 where
@@ -36,15 +36,13 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Arrive<T> {
         steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
     ) -> Rc<RefCell<SteeringAcceleration<T>>> {
         let behavior = self.behavior.borrow();
-        steering_acceleration.borrow_mut().linear =
-            *behavior.target.borrow().get_position() - *behavior.owner.borrow().get_position();
-        let to_target = distance(
-            &Point3::from_coordinates(steering_acceleration.borrow().linear),
-            &Point3::origin(),
-        );
+        let mut sa = steering_acceleration.borrow_mut();
+        sa.linear = *behavior.target.borrow().get_position() -
+            *behavior.owner.borrow().get_position();
+        let to_target = distance(&Point3::from_coordinates(sa.linear), &Point3::origin());
 
         if to_target <= self.tolerance {
-            steering_acceleration.borrow_mut().set_zero();
+            sa.set_zero();
         }
         let mut target_speed = match self.behavior.borrow().limiter {
             Some(ref lim) => lim.borrow().get_max_linear_speed(),
@@ -53,16 +51,10 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Arrive<T> {
         if to_target <= self.deceleration_radius {
             target_speed *= to_target / self.deceleration_radius;
         }
-        steering_acceleration.borrow_mut().linear = steering_acceleration
-            .borrow()
-            .linear
-            .multiply_by(target_speed / to_target);
-        steering_acceleration.borrow_mut().linear -= *behavior.owner.borrow().get_linear_velocity();
-        steering_acceleration.borrow_mut().linear = steering_acceleration
-            .borrow()
-            .linear
-            .multiply_by(T::one() / self.time_to_target);
-        steering_acceleration.borrow_mut().angular = T::zero();
-        steering_acceleration
+        sa.linear = sa.linear.multiply_by(target_speed / to_target);
+        sa.linear -= *behavior.owner.borrow().get_linear_velocity();
+        sa.linear = sa.linear.multiply_by(T::one() / self.time_to_target);
+        sa.angular = T::zero();
+        steering_acceleration.clone()
     }
 }

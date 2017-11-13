@@ -7,6 +7,7 @@ use std::rc::Rc;
 
 use Steerable;
 /// Common properties of steering behaviors
+#[builder(pattern = "immutable")]
 #[derive(Builder, Clone)]
 pub struct SteeringBehavior<T>
 where
@@ -28,19 +29,19 @@ pub trait HasSteeringBehavior<T: Real> {
 }
 
 pub trait IsEnabled<T> {
-    fn isEnabled(&mut self) -> bool;
-    fn setEnabled(&mut self, value: bool);
+    fn is_enabled(&mut self) -> bool;
+    fn set_enabled(&mut self, value: bool);
 }
 
 impl<T: Real, U> IsEnabled<T> for U
 where
     U: HasSteeringBehavior<T>,
 {
-    fn isEnabled(&mut self) -> bool {
+    fn is_enabled(&mut self) -> bool {
         self.get_steering_behavior().enabled
     }
 
-    fn setEnabled(&mut self, value: bool) {
+    fn set_enabled(&mut self, value: bool) {
         self.get_steering_behavior().enabled = value;
     }
 }

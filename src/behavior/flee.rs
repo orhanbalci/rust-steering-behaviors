@@ -2,13 +2,13 @@ use super::super::{HasSteeringBehavior, SteeringAcceleration, SteeringAccelerati
                    SteeringBehavior};
 use alga::general::Real;
 use alga::general::AbstractModule;
-use Steerable;
 
 use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 /// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
 /// to go away from target
+#[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Flee<T>
 where
@@ -31,8 +31,8 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Flee<T> {
         steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
     ) -> Rc<RefCell<SteeringAcceleration<T>>> {
         let behavior = self.behavior.borrow();
-        steering_acceleration.borrow_mut().linear = (*behavior.owner.borrow().get_position()
-            - *behavior.target.borrow().get_position())
+        steering_acceleration.borrow_mut().linear = (*behavior.owner.borrow().get_position() -
+                                                         *behavior.target.borrow().get_position())
             .normalize()
             .multiply_by(match self.behavior.borrow().limiter {
                 Some(ref l) => (*l).borrow().get_max_linear_acceleration(),

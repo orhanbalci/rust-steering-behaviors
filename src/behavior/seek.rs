@@ -3,13 +3,13 @@ use super::super::HasSteeringBehavior;
 use super::super::{SteeringAcceleration, SteeringAccelerationCalculator};
 use alga::general::Real;
 use alga::general::AbstractModule;
-use Steerable;
 
 use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 /// Seek behavior calculates the maximum linear valocity to reach the target location
+#[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Seek<T>
 where
@@ -31,14 +31,15 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Seek<T> {
         steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
     ) -> Rc<RefCell<SteeringAcceleration<T>>> {
         let behavior = self.behavior.borrow().clone();
-        let position_diff =
-            behavior.target.borrow().get_position() - *behavior.owner.borrow().get_position();
-        steering_acceleration.borrow_mut().linear = position_diff.normalize().multiply_by(
-            match self.behavior.borrow().limiter {
+        let position_diff = behavior.target.borrow().get_position() -
+            *behavior.owner.borrow().get_position();
+        steering_acceleration.borrow_mut().linear =
+            position_diff.normalize().multiply_by(match self.behavior
+                .borrow()
+                .limiter {
                 Some(ref a) => (*a).borrow().get_max_linear_acceleration(),
                 None => T::one(),
-            },
-        );
+            });
         steering_acceleration.borrow_mut().angular = T::zero();
         steering_acceleration
     }

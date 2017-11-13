@@ -2,7 +2,6 @@ use nalgebra::{distance_squared, Point3, Vector3};
 use alga::general::Real;
 use alga::general::AbstractModule;
 use num_traits::identities::Zero;
-use Steerable;
 use IsEnabled;
 
 use std::cell::RefCell;
@@ -72,8 +71,8 @@ impl<T: Real> SteeringAcceleration<T> {
 
     ///
     pub fn calculate_square_magnitude(&self) -> T {
-        distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin())
-            + self.angular * self.angular
+        distance_squared(&Point3::from_coordinates(self.linear), &Point3::origin()) +
+            self.angular * self.angular
     }
 
     ///
@@ -87,7 +86,7 @@ pub trait SteeringAccelerationCalculator<T: Real>: IsEnabled<T> {
         &mut self,
         steering_acceleration: Rc<RefCell<SteeringAcceleration<T>>>,
     ) -> Rc<RefCell<SteeringAcceleration<T>>> {
-        if self.isEnabled() {
+        if self.is_enabled() {
             self.calculate_real_steering(steering_acceleration.clone());
             steering_acceleration
         } else {
