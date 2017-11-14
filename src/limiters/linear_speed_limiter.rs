@@ -1,7 +1,7 @@
 use alga::general::Real;
 use super::super::Limiter;
 
-#[allow(unused)]
+#[allow(dead_code)]
 pub struct LinearSpeedLimiter<T: Real> {
     max_linear_speed: T,
 }

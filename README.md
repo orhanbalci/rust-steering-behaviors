@@ -8,16 +8,16 @@ AI Steering behaviors crate implemented in Rust
 
 This project aims to port libgdx-ai steering module to rust.
 
-### Currently implemented behaviors
+### Currently Implemented Behaviors
 - [x] Seek 
 - [x] Pursue
 - [x] Arrive
 - [x] Flee
 - [x] Evade
+- [x] Face
 
-### Missing behaviors
+### Missing Behaviors
 - [ ] Wander
-- [ ] Face
 - [ ] Follow Path
 - [ ] Follow Flow Field
 - [ ] Hide
@@ -28,11 +28,13 @@ This project aims to port libgdx-ai steering module to rust.
 - [ ] Raycast Obstacle Avoidance
 - [ ] Seperation
 
+### Implemented Limiters
+- [x] Angular Acceleration Limiter
+- [x] Angular Limiter
+- [x] Angular Speed Limiter
+- [x] Full Limiter
+- [x] Linear Speed Limiter
+
 ### Missing limiters
-- [ ] Angular Acceleration Limiter
-- [ ] Angular Limiter
-- [ ] Angular Speed Limiter
-- [ ] Full Limiter
 - [ ] Linear Acceleration Limiter
 - [ ] Linear Limiter
-- [ ] Linear Speed Limiter
