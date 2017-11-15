@@ -8,6 +8,9 @@ use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+///Face behavior aims owner to look at target. It only produces an angular
+///acceleration component enabling owner of the behaviour to turn around its
+///own axis until facing towards its target
 #[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Face<T>

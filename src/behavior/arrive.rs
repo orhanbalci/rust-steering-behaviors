@@ -7,8 +7,8 @@ use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-/// This behavior is the oposite of Seek behavior. It produces linear steering acceleration
-/// to go away from target
+///This behavior aims to arrive at target position and stop. It is like Seek
+///behavior but aiming to be at zero speed on target.
 #[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Arrive<T>
@@ -17,9 +17,11 @@ where
 {
     /// Common behavior attributes
     pub behavior: RefCell<SteeringBehavior<T>>,
-    /// Target to go away from
+    /// Stop if we are close enough. 
     pub tolerance: T,
+    /// Reduce the speed if we are close enough 
     pub deceleration_radius: T,
+    /// How quick should we aproach target.
     pub time_to_target: T,
 }
 

@@ -7,6 +7,9 @@ use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+///Pursue behaviour aims to steer the agent towards target by predicting
+///where target will be in time t. Steering calculation is based on targets
+///future position. It is like aiming at a moving target.
 #[builder(pattern = "immutable")]
 #[derive(Builder)]
 pub struct Pursue<T>
