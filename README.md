@@ -34,7 +34,5 @@ This project aims to port libgdx-ai steering module to rust.
 - [x] Angular Speed Limiter
 - [x] Full Limiter
 - [x] Linear Speed Limiter
-
-### Missing limiters
-- [ ] Linear Acceleration Limiter
-- [ ] Linear Limiter
+- [x] Linear Acceleration Limiter
+- [x] Linear Limiter
