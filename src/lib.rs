@@ -1,3 +1,6 @@
+//! This library implements real life like behaviors for your autonomous in game agents
+//! Implement Steerable trait for your agent, choose a behaviour, calculate steering and apply
+//! calculated acceleration to your agents velocity.
 extern crate alga;
 #[macro_use]
 extern crate derive_builder;
