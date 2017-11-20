@@ -9,6 +9,8 @@ homepage = "https://github.com/orhanbalci"
 keywords = ["gamedev","ai", "behavior"]
 license = "MIT"
 exclude = [".travis.yml"]
+readme = "README.md"
+categories = ["game-engines"]
 
 [dependencies]
 alga = "*"
