@@ -13,14 +13,14 @@ readme = "README.md"
 categories = ["game-engines"]
 
 [dependencies]
-alga = "*"
+alga = "0.5.2"
 derive_builder = "0.5.0"
-nalgebra = "*"
-num-traits = "*"
+nalgebra = "0.13.1"
+num-traits = "0.1.40"
 
 [dev-dependencies]
-termion = "*"
-tui = "*"
+termion = "1.5.1"
+tui = "0.1.3"
 
 [[example]]
 name="testbehaviors"
