@@ -18,7 +18,7 @@ use termion::input::TermRead;
 use tui::Terminal;
 use tui::backend::TermionBackend;
 use tui::widgets::{border, Block, List, SelectableList, Widget};
-use tui::widgets::canvas::{Canvas, Line, Map, MapResolution};
+use tui::widgets::canvas::{Canvas, Line};
 use tui::layout::{Direction, Group, Size};
 use tui::style::{Color, Modifier, Style};
 
@@ -38,10 +38,7 @@ struct App<'a> {
     items: Vec<&'a str>,
     selected: usize,
     events: Vec<(&'a str, &'a str)>,
-    info_style: Style,
-    warning_style: Style,
     error_style: Style,
-    critical_style: Style,
     v: Rc<RefCell<Vehicle>>,
     behavior: Option<Rc<RefCell<SteeringAccelerationCalculator<f32>>>>,
     positions: Vec<String>,
@@ -52,38 +49,8 @@ impl<'a> App<'a> {
         App {
             items: vec!["Seek", "Flee", "Pursue", "Arrive", "Evade"],
             selected: 0,
-            events: vec![
-                ("Event1", "INFO"),
-                ("Event2", "INFO"),
-                ("Event3", "CRITICAL"),
-                ("Event4", "ERROR"),
-                ("Event5", "INFO"),
-                ("Event6", "INFO"),
-                ("Event7", "WARNING"),
-                ("Event8", "INFO"),
-                ("Event9", "INFO"),
-                ("Event10", "INFO"),
-                ("Event11", "CRITICAL"),
-                ("Event12", "INFO"),
-                ("Event13", "INFO"),
-                ("Event14", "INFO"),
-                ("Event15", "INFO"),
-                ("Event16", "INFO"),
-                ("Event17", "ERROR"),
-                ("Event18", "ERROR"),
-                ("Event19", "INFO"),
-                ("Event20", "INFO"),
-                ("Event21", "WARNING"),
-                ("Event22", "INFO"),
-                ("Event23", "INFO"),
-                ("Event24", "WARNING"),
-                ("Event25", "INFO"),
-                ("Event26", "INFO"),
-            ],
-            info_style: Style::default().fg(Color::White),
-            warning_style: Style::default().fg(Color::Yellow),
+            events: vec![("Event26", "INFO")],
             error_style: Style::default().fg(Color::Magenta),
-            critical_style: Style::default().fg(Color::Red),
             v: Rc::new(RefCell::new(Vehicle::new())),
             behavior: None,
             positions: vec![],
@@ -337,7 +304,6 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>
                             "Steering Actors",
                         ))
                         .paint(|ctx| {
-                            /// draw steerable vehicle
                             ctx.draw(&Line {
                                 x1: f64::from(
                                     app.v.borrow().get_position().as_slice()[0] - 10.0f32,
@@ -398,7 +364,6 @@ fn draw(t: &mut Terminal<TermionBackend>, app: &App, target: Rc<RefCell<Vehicle>
                                 ),
                                 color: Color::Red,
                             });
-                            /// draw target
                             ctx.draw(&Line {
                                 x1: f64::from(
                                     target.borrow().get_position().as_slice()[0] - 10.0f32,

@@ -1,6 +1,5 @@
 #[cfg(test)]
-use super::super::{Steerable, SteeringAcceleration, SteeringAccelerationCalculator,
-                   SteeringBehavior};
+use super::super::{Steerable, SteeringAcceleration, SteeringAccelerationCalculator};
 use nalgebra::Vector3;
 use alga::general::AbstractModule;
 use std::cell::RefCell;
@@ -45,6 +44,7 @@ impl TestSteerable {
         }
     }
 
+    #[allow(dead_code)]
     pub fn advance(&mut self, calc: &mut SteeringAccelerationCalculator<f32>, milis: f32) {
         let mut sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
         sa = calc.calculate_steering(sa);
@@ -53,6 +53,7 @@ impl TestSteerable {
         self.position = self.position + self.linear_velocity.multiply_by(milis / 1000.0);
     }
 
+    #[allow(dead_code)]
     pub fn advance_by_velocity(&mut self, milis: f32) {
         self.position += self.linear_velocity.multiply_by(milis / 1000.0);
     }

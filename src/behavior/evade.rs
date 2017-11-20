@@ -7,7 +7,7 @@ use std::cell::RefMut;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-///Evade behaviour produces the negative steering of Pursue behavior. 
+///Evade behaviour produces the negative steering of Pursue behavior.
 ///With this behavior owner tries to run away from targets future position
 ///at time t.
 #[builder(pattern = "immutable")]

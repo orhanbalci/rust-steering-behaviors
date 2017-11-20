@@ -115,7 +115,7 @@ mod test {
 
     #[test]
     fn is_zero_negative() {
-        let mut acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 2.0, 3.0), 5.0f32);
+        let acceleration = SteeringAcceleration::new(Vector3::new(1.0f32, 2.0, 3.0), 5.0f32);
         assert_eq!(acceleration.is_zero(), false);
     }
 
@@ -142,7 +142,7 @@ mod test {
 
     #[test]
     fn calculate_square_magnitude() {
-        let mut acceleration = SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32);
+        let acceleration = SteeringAcceleration::new(Vector3::new(2.0f32, 2.0, 2.0), 2.0f32);
         assert_eq!(16f32, acceleration.calculate_square_magnitude());
     }
 

@@ -49,7 +49,6 @@ impl<T: Real> SteeringAccelerationCalculator<T> for Seek<T> {
 mod test {
     use super::Seek;
     use super::super::test_common::TestSteerable;
-    use super::super::super::Steerable;
     use super::SteeringBehavior;
     use super::SteeringAccelerationCalculator;
     use super::SteeringAcceleration;
@@ -59,8 +58,8 @@ mod test {
 
     #[test]
     fn test_same_location() {
-        let mut test_target = TestSteerable::new();
-        let mut test_owner = TestSteerable::new();
+        let test_target = TestSteerable::new();
+        let test_owner = TestSteerable::new();
 
         let mut test_behavior = Seek {
             behavior: RefCell::new(SteeringBehavior {
@@ -72,7 +71,7 @@ mod test {
             }),
         };
 
-        let mut sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
+        let sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
 
         let acceleration_result = test_behavior.calculate_steering(sa);
         // assert_eq!(Vector3::new(0.0f32,0.0,0.0), acceleration_result.linear);
@@ -96,7 +95,7 @@ mod test {
             }),
         };
 
-        let mut sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
+        let sa = Rc::new(RefCell::new(SteeringAcceleration::default()));
 
         let acceleration_result = test_behavior.calculate_steering(sa);
         assert_eq!(

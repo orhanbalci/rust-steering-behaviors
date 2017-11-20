@@ -2,6 +2,13 @@
 authors = ["Orhan Balci <orhanbalci@gmail.com>"]
 name = "steering"
 version = "0.1.0"
+description = "Steering calculations for autonomous agents"
+documentation = "http://orhanbalci.github.io/rust-steering-behaviors"
+repository = "https://github.com/orhanbalci/rust-steering-behaviors.git"
+homepage = "https://github.com/orhanbalci"
+keywords = ["gamedev","ai", "behavior"]
+license = "MIT"
+exclude = [".travis.yml"]
 
 [dependencies]
 alga = "*"
@@ -12,3 +19,7 @@ num-traits = "*"
 [dev-dependencies]
 termion = "*"
 tui = "*"
+
+[[example]]
+name="testbehaviors"
+source="examples/testbehaviors.rs"

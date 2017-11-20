@@ -17,9 +17,9 @@ where
 {
     /// Common behavior attributes
     pub behavior: RefCell<SteeringBehavior<T>>,
-    /// Stop if we are close enough. 
+    /// Stop if we are close enough.
     pub tolerance: T,
-    /// Reduce the speed if we are close enough 
+    /// Reduce the speed if we are close enough
     pub deceleration_radius: T,
     /// How quick should we aproach target.
     pub time_to_target: T,
