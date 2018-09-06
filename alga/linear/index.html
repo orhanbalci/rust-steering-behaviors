@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `linear` mod in crate `alga`."><meta name="keywords" content="rust, rustlang, rust-lang, linear"><title>alga::linear - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module linear</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../index.html'>alga</a></p><script>window.sidebarCurrent = {name: 'linear', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>alga</a>::<wbr><a class="mod" href=''>linear</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/alga/linear/mod.rs.html#1-13' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Traits dedicated to linear algebra.</p>
+</div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AffineSpace.html"
+                                  title='trait alga::linear::AffineSpace'>AffineSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A set points associated with a vector space and a transitive and free additive group action
+(the translation).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AffineTransformation.html"
+                                  title='trait alga::linear::AffineTransformation'>AffineTransformation</a></td>
+                           <td class='docblock-short'>
+                                <p>The group of affine transformations. They are decomposable into a rotation, a non-uniform
+scaling, a second rotation, and a translation (applied in that order).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.DirectIsometry.html"
+                                  title='trait alga::linear::DirectIsometry'>DirectIsometry</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the orientation-preserving isometry group <code>SE(n)</code>, i.e., rotations and translations.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.EuclideanSpace.html"
+                                  title='trait alga::linear::EuclideanSpace'>EuclideanSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>The finite-dimensional affine space based on the field of reals.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.FiniteDimInnerSpace.html"
+                                  title='trait alga::linear::FiniteDimInnerSpace'>FiniteDimInnerSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A finite-dimensional vector space equipped with an inner product that must coincide
+with the dot product.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.FiniteDimVectorSpace.html"
+                                  title='trait alga::linear::FiniteDimVectorSpace'>FiniteDimVectorSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A finite-dimensional vector space.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.InnerSpace.html"
+                                  title='trait alga::linear::InnerSpace'>InnerSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A vector space aquipped with an inner product.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.InversibleSquareMatrix.html"
+                                  title='trait alga::linear::InversibleSquareMatrix'>InversibleSquareMatrix</a></td>
+                           <td class='docblock-short'>
+                                <p>The group of inversible matrix. Commonly known as the General Linear group <code>GL(n)</code> by
+algebraists.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Isometry.html"
+                                  title='trait alga::linear::Isometry'>Isometry</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the isometry group <code>E(n)</code>, i.e., rotations, reflexions, and translations.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Matrix.html"
+                                  title='trait alga::linear::Matrix'>Matrix</a></td>
+                           <td class='docblock-short'>
+                                <p>The space of all matrices.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MatrixMut.html"
+                                  title='trait alga::linear::MatrixMut'>MatrixMut</a></td>
+                           <td class='docblock-short'>
+                                <p>The space of all matrices that are stable under modifications of its components, rows and columns.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.NormedSpace.html"
+                                  title='trait alga::linear::NormedSpace'>NormedSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A normed vector space.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.OrthogonalTransformation.html"
+                                  title='trait alga::linear::OrthogonalTransformation'>OrthogonalTransformation</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the n-dimensional rotations and scaling <code>O(n)</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ProjectiveTransformation.html"
+                                  title='trait alga::linear::ProjectiveTransformation'>ProjectiveTransformation</a></td>
+                           <td class='docblock-short'>
+                                <p>The most general form of inversible transformations on an euclidean space.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Rotation.html"
+                                  title='trait alga::linear::Rotation'>Rotation</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the n-dimensional rotation group <code>SO(n)</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Scaling.html"
+                                  title='trait alga::linear::Scaling'>Scaling</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the (signed) uniform scaling group.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Similarity.html"
+                                  title='trait alga::linear::Similarity'>Similarity</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the similarity group <code>S(n)</code>, i.e., rotations, translations, and (signed) uniform scaling.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.SquareMatrix.html"
+                                  title='trait alga::linear::SquareMatrix'>SquareMatrix</a></td>
+                           <td class='docblock-short'>
+                                <p>The monoid of all square matrices, including non-inversible ones.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.SquareMatrixMut.html"
+                                  title='trait alga::linear::SquareMatrixMut'>SquareMatrixMut</a></td>
+                           <td class='docblock-short'>
+                                <p>The monoid of all mutable square matrices that are stable under modification of its diagonal.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Transformation.html"
+                                  title='trait alga::linear::Transformation'>Transformation</a></td>
+                           <td class='docblock-short'>
+                                <p>A general transformation acting on an euclidean space. It may not be inversible.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Translation.html"
+                                  title='trait alga::linear::Translation'>Translation</a></td>
+                           <td class='docblock-short'>
+                                <p>Subgroups of the n-dimensional translation group <code>T(n)</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.VectorSpace.html"
+                                  title='trait alga::linear::VectorSpace'>VectorSpace</a></td>
+                           <td class='docblock-short'>
+                                <p>A vector space has a module structure over a field instead of a ring.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "alga";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

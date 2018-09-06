@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["general","Fundamental algebraic structures."],["linear","Traits dedicated to linear algebra."]]});

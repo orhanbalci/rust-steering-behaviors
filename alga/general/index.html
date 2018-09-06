@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `general` mod in crate `alga`."><meta name="keywords" content="rust, rustlang, rust-lang, general"><title>alga::general - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module general</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../index.html'>alga</a></p><script>window.sidebarCurrent = {name: 'general', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>alga</a>::<wbr><a class="mod" href=''>general</a></span><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../src/alga/general/mod.rs.html#15-187' title='goto source code'>[src]</a></span></h1><div class='docblock'><p>Fundamental algebraic structures.</p>
+<p>For most applications requiring an abstraction over the reals, <code>Real</code>
+should be sufficient.</p>
+<h2 id="algebraic-properties" class="section-header"><a href="#algebraic-properties">Algebraic properties</a></h2>
+<p>The goal of algebraic structures is to allow elements of sets to be combined together using one
+or several operators. The number and properties of those operators characterize the algebraic
+structure. Abstract operators are usually noted <code>∘</code>, <code>+</code>, or <code>×</code>. The last two are preferred
+when their behavior conform with the usual meaning of addition and multiplication of reals.
+Let <code>Self</code> be a set. Here is a list of the most common properties those operator may fulfill:</p>
+<pre><code class="language-notrust">(Closure)       a, b ∈ Self ⇒ a ∘ b ∈ Self,
+(Divisibility)  ∀ a, b ∈ Self, ∃! r, l ∈ Self such that l ∘ a = b and a ∘ r = b
+(Invertibility) ∃ e ∈ Self, ∀ a ∈ Self, ∃ r, l ∈ Self such that l ∘ a = a ∘ r = e
+                If the right and left inverse are equal they are usually noted r = l = a⁻¹.
+(Associativity) ∀ a, b, c ∈ Self, (a ∘ b) ∘ c = a ∘ (b ∘ c)
+(Neutral Elt.)  ∃ e ∈ Self, ∀ a ∈ Self, e ∘ a = a ∘ e = a
+(Commutativity) ∀ a, b ∈ Self, a ∘ b = b ∘ a
+</code></pre>
+<h2 id="identity-elements" class="section-header"><a href="#identity-elements">Identity elements</a></h2>
+<p>Two traits are provided that allow the definition of the additive and
+multiplicative identity elements:</p>
+<ul>
+<li><code>IdentityAdditive</code></li>
+<li><code>IdentityMultiplicative</code></li>
+</ul>
+<h2 id="abstractgroup-like-structures" class="section-header"><a href="#abstractgroup-like-structures">AbstractGroup-like structures</a></h2>
+<p>These structures are provided for both the addition and multiplication.</p>
+<p>These can be derived automatically by <code>alga_traits</code> attribute from <code>alga_derive</code> crate.</p>
+<pre><code class="language-notrust">           AbstractMagma
+                |
+        _______/ \______
+       /                \
+ divisibility       associativity
+      |                  |
+      V                  V
+AbstractQuasigroup AbstractSemigroup
+      |                  |
+  identity            identity
+      |                  |
+      V                  V
+ AbstractLoop       AbstractMonoid
+      |                  |
+ associativity     invertibility
+       \______   _______/
+              \ /
+               |
+               V
+         AbstractGroup
+               |
+         commutativity
+               |
+               V
+     AbstractGroupAbelian
+</code></pre>
+<p>The following traits are provided:</p>
+<ul>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Magma</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Quasigroup</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Loop</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Semigroup</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Monoid</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>Group</code></li>
+<li>(<code>Abstract</code>|<code>Additive</code>|<code>Multiplicative</code>)<code>GroupAbelian</code></li>
+</ul>
+<h2 id="ring-like-structures" class="section-header"><a href="#ring-like-structures">Ring-like structures</a></h2>
+<p>These can be derived automatically by <code>alga_traits</code> attribute from <code>alga_derive</code> crate.</p>
+<pre><code class="language-notrust">     GroupAbelian           Monoid
+          \________   ________/
+                   \ /
+                    |
+                    V
+                   Ring
+                    |
+           commutativity_of_mul
+                    |
+                    V
+             RingCommutative           GroupAbelian
+                     \_______   ___________/
+                             \ /
+                              |
+                              V
+                            Field
+</code></pre>
+<p>The following traits are provided:</p>
+<ul>
+<li><code>Ring</code></li>
+<li><code>RingCommutative</code></li>
+<li><code>Field</code></li>
+</ul>
+<h2 id="module-like-structures" class="section-header"><a href="#module-like-structures">Module-like structures</a></h2>
+<pre><code class="language-notrust">    GroupAbelian         RingCommutative
+          \______         _____/
+                 \       /
+                  |     |
+                  V     V
+               Module&lt;Scalar&gt;          Field
+                   \______         _____/
+                          \       /
+                           |     |
+                           V     V
+                     VectorSpace&lt;Scalar&gt;
+</code></pre>
+<p>The following traits are provided:</p>
+<ul>
+<li><code>Module</code></li>
+<li><code>VectorSpace</code></li>
+</ul>
+<h1 id="quickcheck-properties" class="section-header"><a href="#quickcheck-properties">Quickcheck properties</a></h1>
+<p>Functions are provided to test that algebraic properties like
+associativity and commutativity hold for a given set of arguments.</p>
+<p>These tests can be automatically derived by <code>alga_quickcheck</code> attribute from <code>alga_derive</code> crate.</p>
+<p>For example:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><pre class="rust rust-example-rendered ignore">
+<span class="kw">use</span> <span class="ident">algebra</span>::<span class="ident">general</span>::<span class="ident">SemigroupMultiplicative</span>;
+
+<span class="macro">quickcheck</span><span class="macro">!</span> {
+    <span class="kw">fn</span> <span class="ident">prop_mul_is_associative</span>(<span class="ident">args</span>: (<span class="ident">i32</span>, <span class="ident">i32</span>, <span class="ident">i32</span>)) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">SemigroupMultiplicative</span>::<span class="ident">prop_mul_is_associative</span>(<span class="ident">args</span>)
+    }
+}</pre>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Additive.html"
+                                  title='struct alga::general::Additive'>Additive</a></td>
+                           <td class='docblock-short'>
+                                <p>The addition operator, commonly symbolized by <code>+</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Id.html"
+                                  title='struct alga::general::Id'>Id</a></td>
+                           <td class='docblock-short'>
+                                <p>The universal identity element wrt. a given operator, usually noted <code>Id</code> with a
+context-dependent subscript.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Multiplicative.html"
+                                  title='struct alga::general::Multiplicative'>Multiplicative</a></td>
+                           <td class='docblock-short'>
+                                <p>The multiplication operator, commonly symbolized by <code>×</code>.</p>
+
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractField.html"
+                                  title='trait alga::general::AbstractField'>AbstractField</a></td>
+                           <td class='docblock-short'>
+                                <p>A field is a commutative ring, and an abelian group under both operators.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractGroup.html"
+                                  title='trait alga::general::AbstractGroup'>AbstractGroup</a></td>
+                           <td class='docblock-short'>
+                                <p>A group is a loop and a monoid at the same time.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractGroupAbelian.html"
+                                  title='trait alga::general::AbstractGroupAbelian'>AbstractGroupAbelian</a></td>
+                           <td class='docblock-short'>
+                                <p>An commutative group.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractLoop.html"
+                                  title='trait alga::general::AbstractLoop'>AbstractLoop</a></td>
+                           <td class='docblock-short'>
+                                <p>A quasigroup with an unique identity element.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractMagma.html"
+                                  title='trait alga::general::AbstractMagma'>AbstractMagma</a></td>
+                           <td class='docblock-short'>
+                                <p>Types that are closed under a given operator.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractModule.html"
+                                  title='trait alga::general::AbstractModule'>AbstractModule</a></td>
+                           <td class='docblock-short'>
+                                <p>A module combines two sets: one with an abelian group structure and another with a
+commutative ring structure.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractMonoid.html"
+                                  title='trait alga::general::AbstractMonoid'>AbstractMonoid</a></td>
+                           <td class='docblock-short'>
+                                <p>A semigroup equipped with an identity element.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractQuasigroup.html"
+                                  title='trait alga::general::AbstractQuasigroup'>AbstractQuasigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>A magma with the divisibility property.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractRing.html"
+                                  title='trait alga::general::AbstractRing'>AbstractRing</a></td>
+                           <td class='docblock-short'>
+                                <p>A ring is the combination of an abelian group and a multiplicative monoid structure.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractRingCommutative.html"
+                                  title='trait alga::general::AbstractRingCommutative'>AbstractRingCommutative</a></td>
+                           <td class='docblock-short'>
+                                <p>A ring with a commutative multiplication.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AbstractSemigroup.html"
+                                  title='trait alga::general::AbstractSemigroup'>AbstractSemigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>An associative magma.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveGroup.html"
+                                  title='trait alga::general::AdditiveGroup'>AdditiveGroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveGroupAbelian.html"
+                                  title='trait alga::general::AdditiveGroupAbelian'>AdditiveGroupAbelian</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveLoop.html"
+                                  title='trait alga::general::AdditiveLoop'>AdditiveLoop</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveMagma.html"
+                                  title='trait alga::general::AdditiveMagma'>AdditiveMagma</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveMonoid.html"
+                                  title='trait alga::general::AdditiveMonoid'>AdditiveMonoid</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveQuasigroup.html"
+                                  title='trait alga::general::AdditiveQuasigroup'>AdditiveQuasigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.AdditiveSemigroup.html"
+                                  title='trait alga::general::AdditiveSemigroup'>AdditiveSemigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ClosedAdd.html"
+                                  title='trait alga::general::ClosedAdd'>ClosedAdd</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Trait alias for <code>Add</code> and <code>AddAsign</code> with result of type <code>Self</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ClosedDiv.html"
+                                  title='trait alga::general::ClosedDiv'>ClosedDiv</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Trait alias for <code>Div</code> and <code>DivAsign</code> with result of type <code>Self</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ClosedMul.html"
+                                  title='trait alga::general::ClosedMul'>ClosedMul</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Trait alias for <code>Mul</code> and <code>MulAsign</code> with result of type <code>Self</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ClosedNeg.html"
+                                  title='trait alga::general::ClosedNeg'>ClosedNeg</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Trait alias for <code>Neg</code> with result of type <code>Self</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.ClosedSub.html"
+                                  title='trait alga::general::ClosedSub'>ClosedSub</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Trait alias for <code>Sub</code> and <code>SubAsign</code> with result of type <code>Self</code>.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Field.html"
+                                  title='trait alga::general::Field'>Field</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Identity.html"
+                                  title='trait alga::general::Identity'>Identity</a></td>
+                           <td class='docblock-short'>
+                                <p>A type that is equipped with identity.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Inverse.html"
+                                  title='trait alga::general::Inverse'>Inverse</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait used to define the inverse element relative to the given operator.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.JoinSemilattice.html"
+                                  title='trait alga::general::JoinSemilattice'>JoinSemilattice</a></td>
+                           <td class='docblock-short'>
+                                <p>A set where every two elements have a suppremum (i.e. smallest upper bound).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Lattice.html"
+                                  title='trait alga::general::Lattice'>Lattice</a></td>
+                           <td class='docblock-short'>
+                                <p>Partially orderable sets where every two elements have a suppremum and infimum.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MeetSemilattice.html"
+                                  title='trait alga::general::MeetSemilattice'>MeetSemilattice</a></td>
+                           <td class='docblock-short'>
+                                <p>A set where every two elements have an infimum (i.e. greatest lower bound).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Module.html"
+                                  title='trait alga::general::Module'>Module</a></td>
+                           <td class='docblock-short'>
+                                <p>A module which overloads the <code>*</code> and <code>+</code> operators.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeGroup.html"
+                                  title='trait alga::general::MultiplicativeGroup'>MultiplicativeGroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeGroupAbelian.html"
+                                  title='trait alga::general::MultiplicativeGroupAbelian'>MultiplicativeGroupAbelian</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeLoop.html"
+                                  title='trait alga::general::MultiplicativeLoop'>MultiplicativeLoop</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeMagma.html"
+                                  title='trait alga::general::MultiplicativeMagma'>MultiplicativeMagma</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeMonoid.html"
+                                  title='trait alga::general::MultiplicativeMonoid'>MultiplicativeMonoid</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeQuasigroup.html"
+                                  title='trait alga::general::MultiplicativeQuasigroup'>MultiplicativeQuasigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.MultiplicativeSemigroup.html"
+                                  title='trait alga::general::MultiplicativeSemigroup'>MultiplicativeSemigroup</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Operator.html"
+                                  title='trait alga::general::Operator'>Operator</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait implemented by types representing abstract operators.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Real.html"
+                                  title='trait alga::general::Real'>Real</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait shared by all reals.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.Ring.html"
+                                  title='trait alga::general::Ring'>Ring</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.RingCommutative.html"
+                                  title='trait alga::general::RingCommutative'>RingCommutative</a></td>
+                           <td class='docblock-short'>
+                                <p>[Alias] Algebraic structure specialized for one kind of operation.</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.SubsetOf.html"
+                                  title='trait alga::general::SubsetOf'>SubsetOf</a></td>
+                           <td class='docblock-short'>
+                                <p>Nested sets and conversions between them (using an injective mapping). Useful to work with
+substructures. In generic code, it is preferable to use <code>SupersetOf</code> as trait bound whenever
+possible instead of <code>SubsetOf</code> (because SupersetOf is automatically implemented whenever
+<code>SubsetOf</code> is).</p>
+
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="trait" href="trait.SupersetOf.html"
+                                  title='trait alga::general::SupersetOf'>SupersetOf</a></td>
+                           <td class='docblock-short'>
+                                <p>Nested sets and conversions between them. Useful to work with substructures. It is preferable
+to implement the <code>SupersetOf</code> trait instead of <code>SubsetOf</code> whenever possible (because
+<code>SupersetOf</code> is automatically implemented whenever <code>SubsetOf</code> is.</p>
+
+                           </td>
+                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "alga";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>
